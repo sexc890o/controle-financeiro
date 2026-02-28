@@ -42,13 +42,13 @@
 
   #menu-header {
     display: flex;
-    justify-content: space-between;
     align-items: center;
     margin-bottom: 20px;
   }
 
-  #menu-header h3 {
-    margin: 0;
+  #menuTitle {
+    margin-left: 10px;
+    font-size: 20px;
   }
 
   #menu ul {
@@ -74,8 +74,8 @@
   #menu ul li button {
     background: none;
     border: none;
-    color: red;
-    font-size: 18px;
+    color: #eee;
+    font-size: 16px;
     cursor: pointer;
     float: right;
   }
@@ -95,6 +95,9 @@
     border-radius: 10px;
     width: 50px;
     height: 50px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
   }
 
   /* Container principal */
@@ -168,13 +171,10 @@
 
 <!-- Botão de menu -->
 <button id="menuButton">☰</button>
+<span id="menuTitleDisplay" style="position: fixed; top: 22px; left: 70px; font-size: 20px; display:none; color: #001f3f;">Menu</span>
 
 <!-- Menu lateral -->
 <div id="menu">
-  <div id="menu-header">
-    <h3 id="menuTitle">Menu</h3>
-    <button id="closeMenuButton">✖</button>
-  </div>
   <ul id="menuList">
     <!-- registros aparecerão aqui -->
   </ul>
@@ -206,8 +206,7 @@
 <script>
   const menuButton = document.getElementById('menuButton');
   const menu = document.getElementById('menu');
-  const closeMenuButton = document.getElementById('closeMenuButton');
-  const menuTitle = document.getElementById('menuTitle');
+  const menuTitleDisplay = document.getElementById('menuTitleDisplay');
 
   const startButton = document.getElementById('startButton');
   const totalDisplay = document.getElementById('total');
@@ -218,14 +217,20 @@
 
   let total = 0;
   let records = [];
+  let menuOpen = false;
 
-  // Abrir/fechar menu
+  // Abrir/fechar menu e trocar ícone e mostrar palavra Menu ao lado
   menuButton.addEventListener('click', () => {
-    menu.classList.add('active');
-  });
-
-  closeMenuButton.addEventListener('click', () => {
-    menu.classList.remove('active');
+    menuOpen = !menuOpen;
+    if(menuOpen){
+      menu.classList.add('active');
+      menuButton.textContent = '✖';
+      menuTitleDisplay.style.display = 'inline';
+    } else {
+      menu.classList.remove('active');
+      menuButton.textContent = '☰';
+      menuTitleDisplay.style.display = 'none';
+    }
   });
 
   // Start
@@ -249,7 +254,7 @@
     const type = document.getElementById('typeInput').value;
 
     if(!date || isNaN(amount)) {
-      alert('Preencha todos os campos obrigatórios');
+      alert('Preencha os campos obrigatórios');
       return;
     }
 
@@ -293,7 +298,7 @@
       }
 
       const deleteBtn = document.createElement('button');
-      deleteBtn.textContent = '🗑️';
+      deleteBtn.textContent = '🗑';
       deleteBtn.onclick = () => deleteRecord(index);
       li.appendChild(deleteBtn);
 
