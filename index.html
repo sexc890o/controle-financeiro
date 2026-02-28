@@ -1,277 +1,267 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Controle Financeiro</title>
-  <style>
-    /* Cores principais */
-    :root {
-      --primary-color: #001f3f; /* azul marinho */
-      --secondary-color: #ffffff; /* branco */
-      --accent-color: #0074D9; /* azul claro para botões */
-    }
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Controle Financeiro</title>
+<style>
+  :root {
+    --primary-color: #001f3f; /* azul marinho */
+    --secondary-color: #ffffff; /* branco */
+    --accent-color: #0074D9; /* azul claro */
+  }
 
-    body {
-      margin: 0;
-      font-family: Arial, sans-serif;
-      background-color: var(--secondary-color);
-      color: var(--primary-color);
-      display: flex;
-      flex-direction: column;
-      min-height: 100vh;
-    }
+  body {
+    margin: 0;
+    font-family: Arial, sans-serif;
+    background-color: var(--secondary-color);
+    color: var(--primary-color);
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+  }
 
-    /* Menu lateral */
-    #menu {
-      position: fixed;
-      top: 0;
-      left: -250px;
-      width: 250px;
-      height: 100%;
-      background-color: var(--primary-color);
-      color: var(--secondary-color);
-      padding: 20px;
-      box-sizing: border-box;
-      transition: left 0.3s;
-      overflow-y: auto;
-    }
+  /* Menu lateral */
+  #menu {
+    position: fixed;
+    top: 0;
+    left: -300px;
+    width: 300px;
+    height: 100%;
+    background-color: var(--primary-color);
+    color: var(--secondary-color);
+    padding: 20px;
+    box-sizing: border-box;
+    transition: left 0.3s;
+    overflow-y: auto;
+  }
 
-    #menu.active {
-      left: 0;
-    }
+  #menu.active {
+    left: 0;
+  }
 
-    #menu h3 {
-      margin-top: 0;
-    }
+  #menu h3 {
+    margin-top: 0;
+  }
 
-    #menu ul {
-      list-style: none;
-      padding: 0;
-    }
+  #menu ul {
+    list-style: none;
+    padding: 0;
+  }
 
-    #menu ul li {
-      padding: 10px 0;
-      border-bottom: 1px solid var(--secondary-color);
-    }
+  #menu ul li {
+    padding: 10px 0;
+    border-bottom: 1px solid var(--secondary-color);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
 
-    /* Botão de menu */
-    #menuButton {
-      position: fixed;
-      top: 10px;
-      left: 10px;
-      background-color: var(--primary-color);
-      color: var(--secondary-color);
-      border: none;
-      padding: 10px;
-      font-size: 20px;
-      cursor: pointer;
-      z-index: 1000;
-    }
+  #menu ul li button {
+    background: none;
+    border: none;
+    color: red;
+    font-size: 18px;
+    cursor: pointer;
+  }
 
-    /* Container principal */
-    #main {
-      flex: 1;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      padding-top: 60px;
-      text-align: center;
-    }
+  /* Botão de menu */
+  #menuButton {
+    position: fixed;
+    top: 10px;
+    left: 10px;
+    background-color: var(--primary-color);
+    color: var(--secondary-color);
+    border: none;
+    padding: 10px;
+    font-size: 20px;
+    cursor: pointer;
+    z-index: 1000;
+  }
 
-    #total {
-      font-size: 32px;
-      margin: 20px 0;
-      border-bottom: 2px solid var(--primary-color);
-      display: inline-block;
-      padding-bottom: 5px;
-    }
+  /* Container principal */
+  #main {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding-top: 60px;
+    text-align: center;
+  }
 
-    #startButton {
-      background-color: var(--primary-color);
-      color: var(--secondary-color);
-      border: none;
-      padding: 15px 30px;
-      font-size: 18px;
-      cursor: pointer;
-      border-radius: 5px;
-    }
+  #total {
+    font-size: 32px;
+    margin: 20px 0;
+    border-bottom: 2px solid var(--primary-color);
+    display: inline-block;
+    padding-bottom: 5px;
+  }
 
-    /* Botão fixo de adicionar */
-    #addButton {
-      position: fixed;
-      bottom: 20px;
-      right: 20px;
-      background-color: var(--accent-color);
-      color: var(--secondary-color);
-      border: none;
-      padding: 20px;
-      font-size: 24px;
-      border-radius: 50%;
-      cursor: pointer;
-    }
+  #startButton {
+    background-color: var(--primary-color);
+    color: var(--secondary-color);
+    border: none;
+    padding: 15px 30px;
+    font-size: 18px;
+    cursor: pointer;
+    border-radius: 5px;
+  }
 
-    /* Formulário de adicionar */
-    #addForm {
-      display: none;
-      position: fixed;
-      bottom: 80px;
-      right: 20px;
-      background-color: var(--secondary-color);
-      border: 1px solid var(--primary-color);
-      padding: 20px;
-      border-radius: 10px;
-      box-shadow: 0 2px 10px rgba(0,0,0,0.3);
-      z-index: 999;
-    }
+  /* Botão fixo de adicionar (bola azul marinho) */
+  #addButton {
+    display: none;
+    margin-top: 20px;
+    background-color: var(--primary-color);
+    color: var(--secondary-color);
+    border: none;
+    padding: 20px;
+    font-size: 24px;
+    border-radius: 50%;
+    cursor: pointer;
+  }
 
-    #addForm input, #addForm select, #addForm button {
-      display: block;
-      margin: 10px 0;
-      padding: 10px;
-      width: 200px;
-    }
+  /* Formulário de adicionar */
+  #addForm {
+    display: none;
+    position: fixed;
+    bottom: 80px;
+    right: 20px;
+    background-color: var(--secondary-color);
+    border: 1px solid var(--primary-color);
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.3);
+    z-index: 999;
+  }
 
-    #records {
-      margin-top: 30px;
-      width: 80%;
-      max-width: 500px;
-    }
-
-    #records div {
-      padding: 10px;
-      border-bottom: 1px solid #ccc;
-    }
-  </style>
+  #addForm input, #addForm select, #addForm button {
+    display: block;
+    margin: 10px 0;
+    padding: 10px;
+    width: 200px;
+  }
+</style>
 </head>
 <body>
 
-  <!-- Botão de menu -->
-  <button id="menuButton">☰</button>
+<!-- Botão de menu -->
+<button id="menuButton">☰</button>
 
-  <!-- Menu lateral -->
-  <div id="menu">
-    <h3>Registros</h3>
-    <ul id="menuList">
-      <!-- Será preenchido pelo JS -->
-    </ul>
-  </div>
+<!-- Menu lateral -->
+<div id="menu">
+  <h3>Registros</h3>
+  <ul id="menuList">
+    <!-- registros aparecerão aqui -->
+  </ul>
+</div>
 
-  <!-- Conteúdo principal -->
-  <div id="main">
-    <h1>Bem-vindo(a)</h1>
-    <button id="startButton">Start</button>
+<!-- Conteúdo principal -->
+<div id="main">
+  <h1>Bem-vindo(a)</h1>
+  <button id="startButton">Start</button>
 
-    <div id="total" style="display:none;">R$ 0</div>
+  <div id="total" style="display:none;">$0</div>
 
-    <div id="records"></div>
-  </div>
-
-  <!-- Botão fixo de adicionar -->
+  <!-- Botão + -->
   <button id="addButton">+</button>
+</div>
 
-  <!-- Formulário de adicionar -->
-  <div id="addForm">
-    <input type="date" id="dateInput" />
-    <input type="number" id="amountInput" placeholder="Valor" />
-    <input type="text" id="reasonInput" placeholder="Motivo" />
-    <select id="typeInput">
-      <option value="income">Ganho</option>
-      <option value="expense">Gasto</option>
-    </select>
-    <button id="submitButton">Enviar</button>
-  </div>
+<!-- Formulário de adicionar -->
+<div id="addForm">
+  <input type="date" id="dateInput" />
+  <input type="number" id="amountInput" placeholder="Valor" />
+  <input type="text" id="reasonInput" placeholder="Motivo" />
+  <select id="typeInput">
+    <option value="income">Ganho</option>
+    <option value="expense">Gasto</option>
+  </select>
+  <button id="submitButton">Enviar</button>
+</div>
 
-  <script>
-    const menuButton = document.getElementById('menuButton');
-    const menu = document.getElementById('menu');
-    const startButton = document.getElementById('startButton');
-    const totalDisplay = document.getElementById('total');
-    const addButton = document.getElementById('addButton');
-    const addForm = document.getElementById('addForm');
-    const submitButton = document.getElementById('submitButton');
-    const recordsDiv = document.getElementById('records');
-    const menuList = document.getElementById('menuList');
+<script>
+  const menuButton = document.getElementById('menuButton');
+  const menu = document.getElementById('menu');
+  const startButton = document.getElementById('startButton');
+  const totalDisplay = document.getElementById('total');
+  const addButton = document.getElementById('addButton');
+  const addForm = document.getElementById('addForm');
+  const submitButton = document.getElementById('submitButton');
+  const menuList = document.getElementById('menuList');
 
-    let total = 0;
-    let records = [];
+  let total = 0;
+  let records = [];
 
-    menuButton.addEventListener('click', () => {
-      menu.classList.toggle('active');
-    });
+  // Abrir/fechar menu
+  menuButton.addEventListener('click', () => {
+    menu.classList.toggle('active');
+  });
 
-    startButton.addEventListener('click', () => {
-      startButton.style.display = 'none';
-      totalDisplay.style.display = 'inline-block';
-      updateTotal();
-    });
+  // Start
+  startButton.addEventListener('click', () => {
+    startButton.style.display = 'none';
+    totalDisplay.style.display = 'inline-block';
+    addButton.style.display = 'inline-block';
+    updateTotal();
+  });
 
-    addButton.addEventListener('click', () => {
-      addForm.style.display = addForm.style.display === 'block' ? 'none' : 'block';
-    });
+  // Abrir formulário
+  addButton.addEventListener('click', () => {
+    addForm.style.display = addForm.style.display === 'block' ? 'none' : 'block';
+  });
 
-    submitButton.addEventListener('click', () => {
-      const date = document.getElementById('dateInput').value;
-      const amount = parseFloat(document.getElementById('amountInput').value);
-      const reason = document.getElementById('reasonInput').value;
-      const type = document.getElementById('typeInput').value;
+  // Adicionar registro
+  submitButton.addEventListener('click', () => {
+    const date = document.getElementById('dateInput').value;
+    const amount = parseFloat(document.getElementById('amountInput').value);
+    const reason = document.getElementById('reasonInput').value;
+    const type = document.getElementById('typeInput').value;
 
-      if(!date || isNaN(amount) || !reason) {
-        alert('Preencha todos os campos');
-        return;
-      }
-
-      const record = { date, amount, reason, type };
-      records.push(record);
-
-      if(type === 'income') {
-        total += amount;
-      } else {
-        total -= amount;
-      }
-
-      updateTotal();
-      updateRecords();
-      updateMenu();
-
-      // Limpar formulário
-      document.getElementById('dateInput').value = '';
-      document.getElementById('amountInput').value = '';
-      document.getElementById('reasonInput').value = '';
-      addForm.style.display = 'none';
-    });
-
-    function updateTotal() {
-      totalDisplay.textContent = `R$ ${total}`;
-      totalDisplay.style.color = total < 0 ? 'red' : 'black';
+    if(!date || isNaN(amount) || !reason) {
+      alert('Preencha todos os campos');
+      return;
     }
 
-    function updateRecords() {
-      recordsDiv.innerHTML = '';
-      records.forEach(r => {
-        const div = document.createElement('div');
-        div.textContent = `${r.date} - ${r.type === 'income' ? '+' : '-'} R$${r.amount} - ${r.reason}`;
-        recordsDiv.appendChild(div);
-      });
-    }
+    const record = { date, amount, reason, type };
+    records.push(record);
 
-    function updateMenu() {
-      const grouped = {};
-      records.forEach(r => {
-        const [year, month] = r.date.split('-');
-        const key = `${year}-${month}`;
-        if(!grouped[key]) grouped[key] = [];
-        grouped[key].push(r);
-      });
+    if(type === 'income') total += amount;
+    else total -= amount;
 
-      menuList.innerHTML = '';
-      Object.keys(grouped).forEach(key => {
-        const li = document.createElement('li');
-        li.textContent = key;
-        menuList.appendChild(li);
-      });
-    }
-  </script>
+    updateTotal();
+    updateMenu();
+
+    // limpar formulário
+    document.getElementById('dateInput').value = '';
+    document.getElementById('amountInput').value = '';
+    document.getElementById('reasonInput').value = '';
+    addForm.style.display = 'none';
+  });
+
+  function updateTotal() {
+    totalDisplay.textContent = `$${total}`;
+    totalDisplay.style.color = total < 0 ? 'red' : 'black';
+  }
+
+  function updateMenu() {
+    menuList.innerHTML = '';
+    records.forEach((r, index) => {
+      const li = document.createElement('li');
+      li.innerHTML = `${r.date} - ${r.type === 'income' ? '+' : '-'} $${r.amount} - ${r.reason} <button onclick="deleteRecord(${index})">🗑️</button>`;
+      menuList.appendChild(li);
+    });
+  }
+
+  // Excluir registro
+  window.deleteRecord = function(index) {
+    const record = records[index];
+    if(record.type === 'income') total -= record.amount;
+    else total += record.amount;
+    records.splice(index,1);
+    updateTotal();
+    updateMenu();
+  }
+</script>
+
 </body>
 </html>
