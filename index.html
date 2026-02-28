@@ -5,195 +5,201 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Controle Financeiro</title>
 <style>
-  :root {
-    --primary-color: #001f3f; /* azul marinho */
-    --secondary-color: #ffffff; /* branco */
-  }
+:root {
+  --primary-color: #001f3f;
+  --secondary-color: #ffffff;
+}
 
-  body {
-    margin: 0;
-    font-family: Arial, sans-serif;
-    background-color: var(--secondary-color);
-    color: var(--primary-color);
-    display: flex;
-    flex-direction: column;
-    min-height: 100vh;
-  }
+/* Corpo */
+body {
+  margin: 0;
+  font-family: Arial, sans-serif;
+  background-color: var(--secondary-color);
+  color: var(--primary-color);
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
 
-  /* Menu lateral */
-  #menu {
-    position: fixed;
-    top: 0;
-    left: -300px;
-    width: 300px;
-    height: 100%;
-    background-color: var(--primary-color);
-    color: var(--secondary-color);
-    padding: 20px;
-    box-sizing: border-box;
-    transition: left 0.3s;
-    overflow-y: auto;
-  }
+/* Menu lateral */
+#menu {
+  position: fixed;
+  top: 0;
+  left: -320px;
+  width: 320px;
+  height: 100%;
+  background-color: var(--primary-color);
+  color: var(--secondary-color);
+  padding: 20px;
+  box-sizing: border-box;
+  transition: left 0.3s;
+  overflow-y: auto;
+}
 
-  #menu.active {
-    left: 0;
-  }
+#menu.active { left: 0; }
 
-  #menu-header {
-    display: flex;
-    align-items: center;
-  }
+#menu-header {
+  display: flex;
+  align-items: center;
+}
 
-  #menuButtonLabel {
-    margin-left: 10px;
-    color: white;
-    font-size: 18px;
-    font-weight: bold;
-  }
+#menuButtonLabel {
+  margin-left: 10px;
+  color: white;
+  font-size: 18px;
+  font-weight: bold;
+}
 
-  #menuList {
-    margin-top: 20px;
-    list-style: none;
-    padding: 0;
-  }
+#menuList {
+  margin-top: 40px; /* mais espaço embaixo do X */
+  list-style: none;
+  padding: 0;
+}
 
-  #menuList li {
-    padding: 10px 0;
-    border-bottom: 1px solid rgba(255,255,255,0.2);
-    position: relative;
-  }
+.year-section {
+  margin-bottom: 20px;
+}
 
-  #menuList li div.date-amount {
-    font-weight: bold;
-  }
+.year-section h4 {
+  border-bottom: 1px solid rgba(255,255,255,0.3);
+  padding-bottom: 3px;
+}
 
-  #menuList li div.reason {
-    font-size: 14px;
-    margin-top: 2px;
-    color: #eee;
-  }
+.month-section {
+  margin-left: 10px;
+  margin-bottom: 10px;
+}
 
-  #menuList li button.deleteBtn {
-    background: none;
-    border: none;
-    color: #fff;
-    font-size: 16px;
-    cursor: pointer;
-    position: absolute;
-    right: 0;
-    top: 10px;
-  }
+#menuList li {
+  padding: 8px 0;
+  position: relative;
+}
 
-  /* Botão de menu */
-  #menuButton {
-    position: fixed;
-    top: 10px;
-    left: 10px;
-    background-color: var(--primary-color);
-    color: var(--secondary-color);
-    border: none;
-    padding: 10px;
-    font-size: 20px;
-    cursor: pointer;
-    z-index: 1000;
-    border-radius: 10px;
-    width: 50px;
-    height: 50px;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-  }
+#menuList li div.date-amount {
+  font-weight: bold;
+}
 
-  /* Container principal */
-  #main {
-    flex: 1;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    padding-top: 60px;
-    text-align: center;
-  }
+#menuList li div.reason {
+  font-size: 14px;
+  margin-top: 2px;
+  color: #eee;
+}
 
-  #total {
-    font-size: 32px;
-    margin: 20px 0;
-    border-bottom: 2px solid var(--primary-color);
-    display: inline-block;
-    padding-bottom: 5px;
-  }
+#menuList li button.deleteBtn {
+  background: none;
+  border: none;
+  color: #fff;
+  font-size: 16px;
+  cursor: pointer;
+  position: absolute;
+  right: 0;
+  top: 10px;
+}
 
-  #startButton {
-    background-color: var(--primary-color);
-    color: var(--secondary-color);
-    border: none;
-    padding: 15px 30px;
-    font-size: 18px;
-    cursor: pointer;
-    border-radius: 5px;
-  }
+/* Botão de menu */
+#menuButton {
+  position: fixed;
+  top: 10px;
+  left: 10px;
+  background-color: var(--primary-color);
+  color: var(--secondary-color);
+  border: none;
+  padding: 10px;
+  font-size: 20px;
+  cursor: pointer;
+  z-index: 1000;
+  border-radius: 10px;
+  width: 50px;
+  height: 50px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
 
-  /* Botão de adicionar */
-  #addButton {
-    display: none;
-    margin-top: 20px;
-    background-color: var(--primary-color);
-    color: var(--secondary-color);
-    border: none;
-    padding: 15px;
-    font-size: 24px;
-    border-radius: 12px;
-    cursor: pointer;
-    width: 60px;
-    height: 60px;
-  }
+/* Conteúdo principal */
+#main {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding-top: 60px;
+  text-align: center;
+}
 
-  /* Formulário de adicionar */
-  #addForm {
-    display: none;
-    position: fixed;
-    bottom: 80px;
-    right: 20px;
-    background-color: var(--secondary-color);
-    border: 1px solid var(--primary-color);
-    padding: 20px;
-    border-radius: 10px;
-    box-shadow: 0 2px 10px rgba(0,0,0,0.3);
-    z-index: 999;
-  }
+#total {
+  font-size: 32px;
+  margin: 20px 0;
+  border-bottom: 2px solid var(--primary-color);
+  display: inline-block;
+  padding-bottom: 5px;
+}
 
-  #addForm input, #addForm select, #addForm button {
-    display: block;
-    margin: 10px 0;
-    padding: 10px;
-    width: 200px;
-  }
+#startButton {
+  background-color: var(--primary-color);
+  color: var(--secondary-color);
+  border: none;
+  padding: 15px 30px;
+  font-size: 18px;
+  cursor: pointer;
+  border-radius: 5px;
+}
+
+/* Botão + */
+#addButton {
+  display: none;
+  margin-top: 20px;
+  background-color: var(--primary-color);
+  color: var(--secondary-color);
+  border: none;
+  padding: 15px;
+  font-size: 24px;
+  border-radius: 12px;
+  cursor: pointer;
+  width: 60px;
+  height: 60px;
+}
+
+/* Formulário */
+#addForm {
+  display: none;
+  position: fixed;
+  bottom: 80px;
+  right: 20px;
+  background-color: var(--secondary-color);
+  border: 1px solid var(--primary-color);
+  padding: 20px;
+  border-radius: 10px;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.3);
+  z-index: 999;
+}
+
+#addForm input, #addForm select, #addForm button {
+  display: block;
+  margin: 10px 0;
+  padding: 10px;
+  width: 200px;
+}
 
 </style>
 </head>
 <body>
 
-<!-- Botão de menu -->
 <button id="menuButton">☰</button>
 <span id="menuButtonLabel" style="display:none;">Menu</span>
 
-<!-- Menu lateral -->
 <div id="menu">
   <ul id="menuList"></ul>
 </div>
 
-<!-- Conteúdo principal -->
 <div id="main">
   <h1>Bem-vindo(a)</h1>
   <button id="startButton">Start</button>
 
   <div id="total" style="display:none;">$0</div>
-
-  <!-- Botão + -->
   <button id="addButton">+</button>
 </div>
 
-<!-- Formulário de adicionar -->
 <div id="addForm">
   <input type="date" id="dateInput" />
   <input type="number" id="amountInput" placeholder="Valor" />
@@ -275,36 +281,69 @@ submitButton.addEventListener('click', () => {
   addForm.style.display = 'none';
 });
 
+// Atualizar total
 function updateTotal() {
   totalDisplay.textContent = `$${total}`;
   totalDisplay.style.color = total < 0 ? 'red' : 'black';
 }
 
-function updateMenu() {
+// Atualizar menu com pastas por ano e mês
+function updateMenu(){
   menuList.innerHTML = '';
-  records.forEach((r, index) => {
-    const li = document.createElement('li');
+  const grouped = {};
 
-    const divDateAmount = document.createElement('div');
-    divDateAmount.className = 'date-amount';
-    divDateAmount.textContent = `${formatDate(r.date)} : $${r.amount}`;
-    li.appendChild(divDateAmount);
+  // Agrupar por ano e mês
+  records.forEach(r => {
+    const [year, month] = r.date.split('-');
+    if(!grouped[year]) grouped[year] = {};
+    if(!grouped[year][month]) grouped[year][month] = [];
+    grouped[year][month].push(r);
+  });
 
-    if(r.reason){
-      const divReason = document.createElement('div');
-      divReason.className = 'reason';
-      divReason.textContent = r.reason;
-      li.appendChild(divReason);
+  for(const year in grouped){
+    const yearDiv = document.createElement('div');
+    yearDiv.className = 'year-section';
+    const yearTitle = document.createElement('h4');
+    yearTitle.textContent = year;
+    yearDiv.appendChild(yearTitle);
+
+    for(const month in grouped[year]){
+      const monthDiv = document.createElement('div');
+      monthDiv.className = 'month-section';
+      const monthName = new Date(year, month-1).toLocaleString('pt-BR', { month: 'long' });
+      const monthTitle = document.createElement('h5');
+      monthTitle.textContent = monthName;
+      monthDiv.appendChild(monthTitle);
+
+      grouped[year][month].forEach((r,index)=>{
+        const li = document.createElement('li');
+
+        const divDateAmount = document.createElement('div');
+        divDateAmount.className = 'date-amount';
+        divDateAmount.textContent = `${formatDate(r.date)} : $${r.amount}`;
+        li.appendChild(divDateAmount);
+
+        if(r.reason){
+          const divReason = document.createElement('div');
+          divReason.className = 'reason';
+          divReason.textContent = r.reason;
+          li.appendChild(divReason);
+        }
+
+        const deleteBtn = document.createElement('button');
+        deleteBtn.className = 'deleteBtn';
+        deleteBtn.textContent = '🗑';
+        deleteBtn.onclick = () => deleteRecord(r);
+        li.appendChild(deleteBtn);
+
+        monthDiv.appendChild(li);
+      });
+
+      yearDiv.appendChild(monthDiv);
     }
 
-    const deleteBtn = document.createElement('button');
-    deleteBtn.className = 'deleteBtn';
-    deleteBtn.textContent = '🗑';
-    deleteBtn.onclick = () => deleteRecord(index);
-    li.appendChild(deleteBtn);
-
-    menuList.appendChild(li);
-  });
+    menuList.appendChild(yearDiv);
+  }
 }
 
 function formatDate(dateStr) {
@@ -312,15 +351,16 @@ function formatDate(dateStr) {
   return `${day}/${month}/${year}`;
 }
 
-function deleteRecord(index){
-  const record = records[index];
-  if(record.type === 'income') total -= record.amount;
-  else total += record.amount;
-  records.splice(index,1);
-  updateTotal();
-  updateMenu();
+function deleteRecord(record){
+  const index = records.indexOf(record);
+  if(index > -1){
+    if(record.type==='income') total -= record.amount;
+    else total += record.amount;
+    records.splice(index,1);
+    updateTotal();
+    updateMenu();
+  }
 }
 </script>
-
 </body>
 </html>
