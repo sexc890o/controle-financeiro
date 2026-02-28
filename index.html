@@ -1,205 +1,277 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Meu Controle Financeiro</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Controle Financeiro</title>
+  <style>
+    /* Cores principais */
+    :root {
+      --primary-color: #001f3f; /* azul marinho */
+      --secondary-color: #ffffff; /* branco */
+      --accent-color: #0074D9; /* azul claro para botões */
+    }
 
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background-color: var(--secondary-color);
+      color: var(--primary-color);
+      display: flex;
+      flex-direction: column;
+      min-height: 100vh;
+    }
 
-<style>
-body {
-    font-family: Arial, sans-serif;
-    margin: 0;
-    background: #ffffff;
-    color: #065f46;
-}
+    /* Menu lateral */
+    #menu {
+      position: fixed;
+      top: 0;
+      left: -250px;
+      width: 250px;
+      height: 100%;
+      background-color: var(--primary-color);
+      color: var(--secondary-color);
+      padding: 20px;
+      box-sizing: border-box;
+      transition: left 0.3s;
+      overflow-y: auto;
+    }
 
-header {
-    background: #16a34a;
-    color: white;
-    padding: 20px;
-    text-align: center;
-}
+    #menu.active {
+      left: 0;
+    }
 
-.container {
-    max-width: 900px;
-    margin: auto;
-    padding: 20px;
-}
+    #menu h3 {
+      margin-top: 0;
+    }
 
-form {
-    display: grid;
-    gap: 10px;
-    margin-bottom: 20px;
-}
+    #menu ul {
+      list-style: none;
+      padding: 0;
+    }
 
-input, select, button {
-    padding: 10px;
-    border-radius: 6px;
-    border: 1px solid #16a34a;
-    font-size: 14px;
-}
+    #menu ul li {
+      padding: 10px 0;
+      border-bottom: 1px solid var(--secondary-color);
+    }
 
-button {
-    background: #16a34a;
-    color: white;
-    font-weight: bold;
-    cursor: pointer;
-}
+    /* Botão de menu */
+    #menuButton {
+      position: fixed;
+      top: 10px;
+      left: 10px;
+      background-color: var(--primary-color);
+      color: var(--secondary-color);
+      border: none;
+      padding: 10px;
+      font-size: 20px;
+      cursor: pointer;
+      z-index: 1000;
+    }
 
-button:hover {
-    background: #15803d;
-}
+    /* Container principal */
+    #main {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding-top: 60px;
+      text-align: center;
+    }
 
-table {
-    width: 100%;
-    border-collapse: collapse;
-    margin-top: 20px;
-}
+    #total {
+      font-size: 32px;
+      margin: 20px 0;
+      border-bottom: 2px solid var(--primary-color);
+      display: inline-block;
+      padding-bottom: 5px;
+    }
 
-th {
-    background: #16a34a;
-    color: white;
-    padding: 10px;
-}
+    #startButton {
+      background-color: var(--primary-color);
+      color: var(--secondary-color);
+      border: none;
+      padding: 15px 30px;
+      font-size: 18px;
+      cursor: pointer;
+      border-radius: 5px;
+    }
 
-td {
-    padding: 10px;
-    text-align: center;
-    border-bottom: 1px solid #d1fae5;
-}
+    /* Botão fixo de adicionar */
+    #addButton {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      background-color: var(--accent-color);
+      color: var(--secondary-color);
+      border: none;
+      padding: 20px;
+      font-size: 24px;
+      border-radius: 50%;
+      cursor: pointer;
+    }
 
-.resumo {
-    margin-top: 20px;
-    font-size: 18px;
-}
+    /* Formulário de adicionar */
+    #addForm {
+      display: none;
+      position: fixed;
+      bottom: 80px;
+      right: 20px;
+      background-color: var(--secondary-color);
+      border: 1px solid var(--primary-color);
+      padding: 20px;
+      border-radius: 10px;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.3);
+      z-index: 999;
+    }
 
-canvas {
-    margin-top: 30px;
-}
-</style>
+    #addForm input, #addForm select, #addForm button {
+      display: block;
+      margin: 10px 0;
+      padding: 10px;
+      width: 200px;
+    }
+
+    #records {
+      margin-top: 30px;
+      width: 80%;
+      max-width: 500px;
+    }
+
+    #records div {
+      padding: 10px;
+      border-bottom: 1px solid #ccc;
+    }
+  </style>
 </head>
-
 <body>
 
-<header>
-<h1>Controle Financeiro Simples</h1>
-</header>
+  <!-- Botão de menu -->
+  <button id="menuButton">☰</button>
 
-<div class="container">
+  <!-- Menu lateral -->
+  <div id="menu">
+    <h3>Registros</h3>
+    <ul id="menuList">
+      <!-- Será preenchido pelo JS -->
+    </ul>
+  </div>
 
-<form id="form">
-<input type="date" id="data" required>
-<input type="text" id="descricao" placeholder="Descrição" required>
-<input type="number" id="valor" placeholder="Valor" required>
-<select id="tipo">
-<option value="ganho">Ganho</option>
-<option value="gasto">Gasto</option>
-</select>
-<button type="submit">Adicionar</button>
-</form>
+  <!-- Conteúdo principal -->
+  <div id="main">
+    <h1>Bem-vindo(a)</h1>
+    <button id="startButton">Start</button>
 
-<table>
-<thead>
-<tr>
-<th>Data</th>
-<th>Descrição</th>
-<th>Tipo</th>
-<th>Valor</th>
-<th>Excluir</th>
-</tr>
-</thead>
-<tbody id="tabela"></tbody>
-</table>
+    <div id="total" style="display:none;">R$ 0</div>
 
-<div class="resumo">
-<p><strong>Total Ganhos:</strong> R$ <span id="ganhos">0</span></p>
-<p><strong>Total Gastos:</strong> R$ <span id="gastos">0</span></p>
-<p><strong>Saldo Final:</strong> R$ <span id="saldo">0</span></p>
-</div>
+    <div id="records"></div>
+  </div>
 
-<canvas id="grafico"></canvas>
+  <!-- Botão fixo de adicionar -->
+  <button id="addButton">+</button>
 
-</div>
+  <!-- Formulário de adicionar -->
+  <div id="addForm">
+    <input type="date" id="dateInput" />
+    <input type="number" id="amountInput" placeholder="Valor" />
+    <input type="text" id="reasonInput" placeholder="Motivo" />
+    <select id="typeInput">
+      <option value="income">Ganho</option>
+      <option value="expense">Gasto</option>
+    </select>
+    <button id="submitButton">Enviar</button>
+  </div>
 
-<script>
-let transacoes = JSON.parse(localStorage.getItem("transacoes")) || [];
+  <script>
+    const menuButton = document.getElementById('menuButton');
+    const menu = document.getElementById('menu');
+    const startButton = document.getElementById('startButton');
+    const totalDisplay = document.getElementById('total');
+    const addButton = document.getElementById('addButton');
+    const addForm = document.getElementById('addForm');
+    const submitButton = document.getElementById('submitButton');
+    const recordsDiv = document.getElementById('records');
+    const menuList = document.getElementById('menuList');
 
-const tabela = document.getElementById("tabela");
-const ganhosEl = document.getElementById("ganhos");
-const gastosEl = document.getElementById("gastos");
-const saldoEl = document.getElementById("saldo");
+    let total = 0;
+    let records = [];
 
-const ctx = document.getElementById("grafico").getContext("2d");
-let grafico = new Chart(ctx, {
-    type: "doughnut",
-    data: {
-        labels: ["Ganhos", "Gastos"],
-        datasets: [{
-            data: [0, 0],
-            backgroundColor: ["#16a34a", "#bbf7d0"]
-        }]
-    }
-});
-
-function atualizar() {
-    tabela.innerHTML = "";
-    let totalGanhos = 0;
-    let totalGastos = 0;
-
-    transacoes.forEach((t, index) => {
-        const row = document.createElement("tr");
-
-        row.innerHTML = `
-            <td>${t.data}</td>
-            <td>${t.descricao}</td>
-            <td>${t.tipo}</td>
-            <td>R$ ${parseFloat(t.valor).toFixed(2)}</td>
-            <td><button onclick="remover(${index})">X</button></td>
-        `;
-
-        tabela.appendChild(row);
-
-        if (t.tipo === "ganho") {
-            totalGanhos += parseFloat(t.valor);
-        } else {
-            totalGastos += parseFloat(t.valor);
-        }
+    menuButton.addEventListener('click', () => {
+      menu.classList.toggle('active');
     });
 
-    ganhosEl.textContent = totalGanhos.toFixed(2);
-    gastosEl.textContent = totalGastos.toFixed(2);
-    saldoEl.textContent = (totalGanhos - totalGastos).toFixed(2);
+    startButton.addEventListener('click', () => {
+      startButton.style.display = 'none';
+      totalDisplay.style.display = 'inline-block';
+      updateTotal();
+    });
 
-    grafico.data.datasets[0].data = [totalGanhos, totalGastos];
-    grafico.update();
+    addButton.addEventListener('click', () => {
+      addForm.style.display = addForm.style.display === 'block' ? 'none' : 'block';
+    });
 
-    localStorage.setItem("transacoes", JSON.stringify(transacoes));
-}
+    submitButton.addEventListener('click', () => {
+      const date = document.getElementById('dateInput').value;
+      const amount = parseFloat(document.getElementById('amountInput').value);
+      const reason = document.getElementById('reasonInput').value;
+      const type = document.getElementById('typeInput').value;
 
-function remover(index) {
-    transacoes.splice(index, 1);
-    atualizar();
-}
+      if(!date || isNaN(amount) || !reason) {
+        alert('Preencha todos os campos');
+        return;
+      }
 
-document.getElementById("form").addEventListener("submit", function(e) {
-    e.preventDefault();
+      const record = { date, amount, reason, type };
+      records.push(record);
 
-    const nova = {
-        data: document.getElementById("data").value,
-        descricao: document.getElementById("descricao").value,
-        valor: document.getElementById("valor").value,
-        tipo: document.getElementById("tipo").value
-    };
+      if(type === 'income') {
+        total += amount;
+      } else {
+        total -= amount;
+      }
 
-    transacoes.push(nova);
-    atualizar();
-    this.reset();
-});
+      updateTotal();
+      updateRecords();
+      updateMenu();
 
-atualizar();
-</script>
+      // Limpar formulário
+      document.getElementById('dateInput').value = '';
+      document.getElementById('amountInput').value = '';
+      document.getElementById('reasonInput').value = '';
+      addForm.style.display = 'none';
+    });
 
+    function updateTotal() {
+      totalDisplay.textContent = `R$ ${total}`;
+      totalDisplay.style.color = total < 0 ? 'red' : 'black';
+    }
+
+    function updateRecords() {
+      recordsDiv.innerHTML = '';
+      records.forEach(r => {
+        const div = document.createElement('div');
+        div.textContent = `${r.date} - ${r.type === 'income' ? '+' : '-'} R$${r.amount} - ${r.reason}`;
+        recordsDiv.appendChild(div);
+      });
+    }
+
+    function updateMenu() {
+      const grouped = {};
+      records.forEach(r => {
+        const [year, month] = r.date.split('-');
+        const key = `${year}-${month}`;
+        if(!grouped[key]) grouped[key] = [];
+        grouped[key].push(r);
+      });
+
+      menuList.innerHTML = '';
+      Object.keys(grouped).forEach(key => {
+        const li = document.createElement('li');
+        li.textContent = key;
+        menuList.appendChild(li);
+      });
+    }
+  </script>
 </body>
 </html>
