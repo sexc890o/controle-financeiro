@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Meu Controle Financeiro</title>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<style>
+body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    background: #ffffff;
+    color: #065f46;
+}
+
+header {
+    background: #16a34a;
+    color: white;
+    padding: 20px;
+    text-align: center;
+}
+
+.container {
+    max-width: 900px;
+    margin: auto;
+    padding: 20px;
+}
+
+form {
+    display: grid;
+    gap: 10px;
+    margin-bottom: 20px;
+}
+
+input, select, button {
+    padding: 10px;
+    border-radius: 6px;
+    border: 1px solid #16a34a;
+    font-size: 14px;
+}
+
+button {
+    background: #16a34a;
+    color: white;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+button:hover {
+    background: #15803d;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 20px;
+}
+
+th {
+    background: #16a34a;
+    color: white;
+    padding: 10px;
+}
+
+td {
+    padding: 10px;
+    text-align: center;
+    border-bottom: 1px solid #d1fae5;
+}
+
+.resumo {
+    margin-top: 20px;
+    font-size: 18px;
+}
+
+canvas {
+    margin-top: 30px;
+}
+</style>
+</head>
+
+<body>
+
+<header>
+<h1>Controle Financeiro Simples</h1>
+</header>
+
+<div class="container">
+
+<form id="form">
+<input type="date" id="data" required>
+<input type="text" id="descricao" placeholder="Descrição" required>
+<input type="number" id="valor" placeholder="Valor" required>
+<select id="tipo">
+<option value="ganho">Ganho</option>
+<option value="gasto">Gasto</option>
+</select>
+<button type="submit">Adicionar</button>
+</form>
+
+<table>
+<thead>
+<tr>
+<th>Data</th>
+<th>Descrição</th>
+<th>Tipo</th>
+<th>Valor</th>
+<th>Excluir</th>
+</tr>
+</thead>
+<tbody id="tabela"></tbody>
+</table>
+
+<div class="resumo">
+<p><strong>Total Ganhos:</strong> R$ <span id="ganhos">0</span></p>
+<p><strong>Total Gastos:</strong> R$ <span id="gastos">0</span></p>
+<p><strong>Saldo Final:</strong> R$ <span id="saldo">0</span></p>
+</div>
+
+<canvas id="grafico"></canvas>
+
+</div>
+
+<script>
+let transacoes = JSON.parse(localStorage.getItem("transacoes")) || [];
+
+const tabela = document.getElementById("tabela");
+const ganhosEl = document.getElementById("ganhos");
+const gastosEl = document.getElementById("gastos");
+const saldoEl = document.getElementById("saldo");
+
+const ctx = document.getElementById("grafico").getContext("2d");
+let grafico = new Chart(ctx, {
+    type: "doughnut",
+    data: {
+        labels: ["Ganhos", "Gastos"],
+        datasets: [{
+            data: [0, 0],
+            backgroundColor: ["#16a34a", "#bbf7d0"]
+        }]
+    }
+});
+
+function atualizar() {
+    tabela.innerHTML = "";
+    let totalGanhos = 0;
+    let totalGastos = 0;
+
+    transacoes.forEach((t, index) => {
+        const row = document.createElement("tr");
+
+        row.innerHTML = `
+            <td>${t.data}</td>
+            <td>${t.descricao}</td>
+            <td>${t.tipo}</td>
+            <td>R$ ${parseFloat(t.valor).toFixed(2)}</td>
+            <td><button onclick="remover(${index})">X</button></td>
+        `;
+
+        tabela.appendChild(row);
+
+        if (t.tipo === "ganho") {
+            totalGanhos += parseFloat(t.valor);
+        } else {
+            totalGastos += parseFloat(t.valor);
+        }
+    });
+
+    ganhosEl.textContent = totalGanhos.toFixed(2);
+    gastosEl.textContent = totalGastos.toFixed(2);
+    saldoEl.textContent = (totalGanhos - totalGastos).toFixed(2);
+
+    grafico.data.datasets[0].data = [totalGanhos, totalGastos];
+    grafico.update();
+
+    localStorage.setItem("transacoes", JSON.stringify(transacoes));
+}
+
+function remover(index) {
+    transacoes.splice(index, 1);
+    atualizar();
+}
+
+document.getElementById("form").addEventListener("submit", function(e) {
+    e.preventDefault();
+
+    const nova = {
+        data: document.getElementById("data").value,
+        descricao: document.getElementById("descricao").value,
+        valor: document.getElementById("valor").value,
+        tipo: document.getElementById("tipo").value
+    };
+
+    transacoes.push(nova);
+    atualizar();
+    this.reset();
+});
+
+atualizar();
+</script>
+
+</body>
+</html>
