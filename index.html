@@ -8,7 +8,6 @@
   :root {
     --primary-color: #001f3f; /* azul marinho */
     --secondary-color: #ffffff; /* branco */
-    --accent-color: #0074D9; /* azul claro */
   }
 
   body {
@@ -43,41 +42,46 @@
   #menu-header {
     display: flex;
     align-items: center;
-    margin-bottom: 20px;
   }
 
-  #menuTitle {
+  #menuButtonLabel {
     margin-left: 10px;
-    font-size: 20px;
+    color: white;
+    font-size: 18px;
+    font-weight: bold;
   }
 
-  #menu ul {
+  #menuList {
+    margin-top: 20px;
     list-style: none;
     padding: 0;
   }
 
-  #menu ul li {
-    padding: 10px;
-    border-bottom: 1px solid var(--secondary-color);
+  #menuList li {
+    padding: 10px 0;
+    border-bottom: 1px solid rgba(255,255,255,0.2);
+    position: relative;
   }
 
-  #menu ul li div.date-amount {
+  #menuList li div.date-amount {
     font-weight: bold;
   }
 
-  #menu ul li div.reason {
+  #menuList li div.reason {
     font-size: 14px;
-    margin-left: 10px;
+    margin-top: 2px;
     color: #eee;
   }
 
-  #menu ul li button {
+  #menuList li button.deleteBtn {
     background: none;
     border: none;
-    color: #eee;
+    color: #fff;
     font-size: 16px;
     cursor: pointer;
-    float: right;
+    position: absolute;
+    right: 0;
+    top: 10px;
   }
 
   /* Botão de menu */
@@ -88,7 +92,7 @@
     background-color: var(--primary-color);
     color: var(--secondary-color);
     border: none;
-    padding: 10px 12px;
+    padding: 10px;
     font-size: 20px;
     cursor: pointer;
     z-index: 1000;
@@ -136,7 +140,7 @@
     background-color: var(--primary-color);
     color: var(--secondary-color);
     border: none;
-    padding: 15px 15px;
+    padding: 15px;
     font-size: 24px;
     border-radius: 12px;
     cursor: pointer;
@@ -171,13 +175,11 @@
 
 <!-- Botão de menu -->
 <button id="menuButton">☰</button>
-<span id="menuTitleDisplay" style="position: fixed; top: 22px; left: 70px; font-size: 20px; display:none; color: #001f3f;">Menu</span>
+<span id="menuButtonLabel" style="display:none;">Menu</span>
 
 <!-- Menu lateral -->
 <div id="menu">
-  <ul id="menuList">
-    <!-- registros aparecerão aqui -->
-  </ul>
+  <ul id="menuList"></ul>
 </div>
 
 <!-- Conteúdo principal -->
@@ -204,123 +206,121 @@
 </div>
 
 <script>
-  const menuButton = document.getElementById('menuButton');
-  const menu = document.getElementById('menu');
-  const menuTitleDisplay = document.getElementById('menuTitleDisplay');
+const menuButton = document.getElementById('menuButton');
+const menuButtonLabel = document.getElementById('menuButtonLabel');
+const menu = document.getElementById('menu');
+const menuList = document.getElementById('menuList');
 
-  const startButton = document.getElementById('startButton');
-  const totalDisplay = document.getElementById('total');
-  const addButton = document.getElementById('addButton');
-  const addForm = document.getElementById('addForm');
-  const submitButton = document.getElementById('submitButton');
-  const menuList = document.getElementById('menuList');
+const startButton = document.getElementById('startButton');
+const totalDisplay = document.getElementById('total');
+const addButton = document.getElementById('addButton');
+const addForm = document.getElementById('addForm');
+const submitButton = document.getElementById('submitButton');
 
-  let total = 0;
-  let records = [];
-  let menuOpen = false;
+let total = 0;
+let records = [];
+let menuOpen = false;
 
-  // Abrir/fechar menu e trocar ícone e mostrar palavra Menu ao lado
-  menuButton.addEventListener('click', () => {
-    menuOpen = !menuOpen;
-    if(menuOpen){
-      menu.classList.add('active');
-      menuButton.textContent = '✖';
-      menuTitleDisplay.style.display = 'inline';
-    } else {
-      menu.classList.remove('active');
-      menuButton.textContent = '☰';
-      menuTitleDisplay.style.display = 'none';
+// Abrir/fechar menu
+menuButton.addEventListener('click', () => {
+  menuOpen = !menuOpen;
+  if(menuOpen){
+    menu.classList.add('active');
+    menuButton.textContent = '✖';
+    menuButtonLabel.style.display = 'inline';
+  } else {
+    menu.classList.remove('active');
+    menuButton.textContent = '☰';
+    menuButtonLabel.style.display = 'none';
+  }
+});
+
+// Start
+startButton.addEventListener('click', () => {
+  startButton.style.display = 'none';
+  totalDisplay.style.display = 'inline-block';
+  addButton.style.display = 'inline-block';
+  updateTotal();
+});
+
+// Abrir formulário
+addButton.addEventListener('click', () => {
+  addForm.style.display = addForm.style.display === 'block' ? 'none' : 'block';
+});
+
+// Adicionar registro
+submitButton.addEventListener('click', () => {
+  const date = document.getElementById('dateInput').value;
+  const amount = parseFloat(document.getElementById('amountInput').value);
+  const reason = document.getElementById('reasonInput').value;
+  const type = document.getElementById('typeInput').value;
+
+  if(!date || isNaN(amount)) {
+    alert('Preencha os campos obrigatórios');
+    return;
+  }
+
+  const record = { date, amount, reason, type };
+  records.push(record);
+
+  if(type === 'income') total += amount;
+  else total -= amount;
+
+  updateTotal();
+  updateMenu();
+
+  document.getElementById('dateInput').value = '';
+  document.getElementById('amountInput').value = '';
+  document.getElementById('reasonInput').value = '';
+  addForm.style.display = 'none';
+});
+
+function updateTotal() {
+  totalDisplay.textContent = `$${total}`;
+  totalDisplay.style.color = total < 0 ? 'red' : 'black';
+}
+
+function updateMenu() {
+  menuList.innerHTML = '';
+  records.forEach((r, index) => {
+    const li = document.createElement('li');
+
+    const divDateAmount = document.createElement('div');
+    divDateAmount.className = 'date-amount';
+    divDateAmount.textContent = `${formatDate(r.date)} : $${r.amount}`;
+    li.appendChild(divDateAmount);
+
+    if(r.reason){
+      const divReason = document.createElement('div');
+      divReason.className = 'reason';
+      divReason.textContent = r.reason;
+      li.appendChild(divReason);
     }
+
+    const deleteBtn = document.createElement('button');
+    deleteBtn.className = 'deleteBtn';
+    deleteBtn.textContent = '🗑';
+    deleteBtn.onclick = () => deleteRecord(index);
+    li.appendChild(deleteBtn);
+
+    menuList.appendChild(li);
   });
+}
 
-  // Start
-  startButton.addEventListener('click', () => {
-    startButton.style.display = 'none';
-    totalDisplay.style.display = 'inline-block';
-    addButton.style.display = 'inline-block';
-    updateTotal();
-  });
+function formatDate(dateStr) {
+  const [year, month, day] = dateStr.split('-');
+  return `${day}/${month}/${year}`;
+}
 
-  // Abrir formulário
-  addButton.addEventListener('click', () => {
-    addForm.style.display = addForm.style.display === 'block' ? 'none' : 'block';
-  });
-
-  // Adicionar registro
-  submitButton.addEventListener('click', () => {
-    const date = document.getElementById('dateInput').value;
-    const amount = parseFloat(document.getElementById('amountInput').value);
-    const reason = document.getElementById('reasonInput').value;
-    const type = document.getElementById('typeInput').value;
-
-    if(!date || isNaN(amount)) {
-      alert('Preencha os campos obrigatórios');
-      return;
-    }
-
-    const record = { date, amount, reason, type };
-    records.push(record);
-
-    if(type === 'income') total += amount;
-    else total -= amount;
-
-    updateTotal();
-    updateMenu();
-
-    // limpar formulário
-    document.getElementById('dateInput').value = '';
-    document.getElementById('amountInput').value = '';
-    document.getElementById('reasonInput').value = '';
-    addForm.style.display = 'none';
-  });
-
-  function updateTotal() {
-    totalDisplay.textContent = `$${total}`;
-    totalDisplay.style.color = total < 0 ? 'red' : 'black';
-  }
-
-  function updateMenu() {
-    menuList.innerHTML = '';
-    records.forEach((r, index) => {
-      const li = document.createElement('li');
-
-      const divDateAmount = document.createElement('div');
-      divDateAmount.className = 'date-amount';
-      divDateAmount.textContent = `${formatDate(r.date)} : $${r.amount}`;
-
-      li.appendChild(divDateAmount);
-
-      if(r.reason) {
-        const divReason = document.createElement('div');
-        divReason.className = 'reason';
-        divReason.textContent = r.reason;
-        li.appendChild(divReason);
-      }
-
-      const deleteBtn = document.createElement('button');
-      deleteBtn.textContent = '🗑';
-      deleteBtn.onclick = () => deleteRecord(index);
-      li.appendChild(deleteBtn);
-
-      menuList.appendChild(li);
-    });
-  }
-
-  function formatDate(dateStr) {
-    const [year, month, day] = dateStr.split('-');
-    return `${day}/${month}/${year}`;
-  }
-
-  // Excluir registro
-  function deleteRecord(index) {
-    const record = records[index];
-    if(record.type === 'income') total -= record.amount;
-    else total += record.amount;
-    records.splice(index,1);
-    updateTotal();
-    updateMenu();
-  }
-
+function deleteRecord(index){
+  const record = records[index];
+  if(record.type === 'income') total -= record.amount;
+  else total += record.amount;
+  records.splice(index,1);
+  updateTotal();
+  updateMenu();
+}
 </script>
+
 </body>
 </html>
