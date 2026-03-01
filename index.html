@@ -8,9 +8,9 @@
 :root {
   --primary-color: #001f3f;
   --secondary-color: #ffffff;
+  --input-border: #007BFF;
 }
 
-/* Corpo */
 body {
   margin: 0;
   font-family: Arial, sans-serif;
@@ -19,6 +19,48 @@ body {
   display: flex;
   flex-direction: column;
   min-height: 100vh;
+}
+
+#loginPage {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  flex: 1;
+  text-align: center;
+  padding-top: 50px;
+}
+
+#loginPage h1 {
+  font-weight: bold;
+  font-size: 32px;
+  margin-bottom: 20px;
+}
+
+#loginPage input {
+  padding: 10px;
+  margin: 10px 0;
+  width: 250px;
+  border-radius: 10px;
+  border: 2px solid var(--input-border);
+  background-color: #ffffff;
+  outline: none;
+  font-size: 16px;
+}
+
+#loginPage button {
+  padding: 10px 20px;
+  border-radius: 10px;
+  border: none;
+  background-color: var(--primary-color);
+  color: var(--secondary-color);
+  cursor: pointer;
+}
+
+#loginButtons {
+  display: flex;
+  gap: 20px;
+  margin-top: 15px;
 }
 
 /* Menu lateral */
@@ -37,63 +79,19 @@ body {
 }
 
 #menu.active { left: 0; }
+#menuList { margin-top: 40px; list-style: none; padding: 0; }
 
-#menu-header {
-  display: flex;
-  align-items: center;
-}
+.year-section { margin-bottom: 20px; }
+.year-section h4 { border-bottom: 1px solid rgba(255,255,255,0.3); padding-bottom: 3px; }
+.month-section { margin-left: 10px; margin-bottom: 10px; }
 
-#menuButtonLabel {
-  margin-left: 10px;
-  color: white;
-  font-size: 18px;
-  font-weight: bold;
-}
-
-#menuList {
-  margin-top: 40px; /* mais espaço embaixo do X */
-  list-style: none;
-  padding: 0;
-}
-
-.year-section {
-  margin-bottom: 20px;
-}
-
-.year-section h4 {
-  border-bottom: 1px solid rgba(255,255,255,0.3);
-  padding-bottom: 3px;
-}
-
-.month-section {
-  margin-left: 10px;
-  margin-bottom: 10px;
-}
-
-#menuList li {
-  padding: 8px 0;
-  position: relative;
-}
-
-#menuList li div.date-amount {
-  font-weight: bold;
-}
-
-#menuList li div.reason {
-  font-size: 14px;
-  margin-top: 2px;
-  color: #eee;
-}
-
+#menuList li { padding: 8px 0; position: relative; }
+#menuList li div.date-amount { font-weight: bold; }
+#menuList li div.reason,
+#menuList li div.payment { font-size: 14px; margin-top: 2px; color: #eee; }
 #menuList li button.deleteBtn {
-  background: none;
-  border: none;
-  color: #fff;
-  font-size: 16px;
-  cursor: pointer;
-  position: absolute;
-  right: 0;
-  top: 10px;
+  background: none; border: none; color: #fff; font-size: 16px; cursor: pointer;
+  position: absolute; right: 0; top: 10px;
 }
 
 /* Botão de menu */
@@ -119,35 +117,19 @@ body {
 /* Conteúdo principal */
 #main {
   flex: 1;
-  display: flex;
+  display: none; 
   flex-direction: column;
   align-items: center;
-  justify-content: center;
+  justify-content: flex-start;
   padding-top: 60px;
   text-align: center;
 }
 
-#total {
-  font-size: 32px;
-  margin: 20px 0;
-  border-bottom: 2px solid var(--primary-color);
-  display: inline-block;
-  padding-bottom: 5px;
-}
-
-#startButton {
-  background-color: var(--primary-color);
-  color: var(--secondary-color);
-  border: none;
-  padding: 15px 30px;
-  font-size: 18px;
-  cursor: pointer;
-  border-radius: 5px;
-}
+#welcomeUser { font-size: 28px; font-weight: bold; margin-bottom: 20px; }
+#total { font-size: 32px; margin: 20px 0; border-bottom: 2px solid var(--primary-color); display: inline-block; padding-bottom: 5px; }
 
 /* Botão + */
 #addButton {
-  display: none;
   margin-top: 20px;
   background-color: var(--primary-color);
   color: var(--secondary-color);
@@ -179,27 +161,41 @@ body {
   margin: 10px 0;
   padding: 10px;
   width: 200px;
+  border-radius: 10px;
+  border: 2px solid var(--input-border);
+  background-color: #ffffff;
+  outline: none;
+  font-size: 16px;
 }
-
 </style>
 </head>
 <body>
 
-<button id="menuButton">☰</button>
-<span id="menuButtonLabel" style="display:none;">Menu</span>
+<!-- Login / Criar Conta -->
+<div id="loginPage">
+  <h1>LOAK</h1>
+  <input type="text" id="usernameInput" placeholder="Usuário" />
+  <input type="password" id="passwordInput" placeholder="Senha" />
+  <div id="loginButtons">
+    <button id="loginButton">Entrar</button>
+    <button id="createButton">Criar Conta</button>
+  </div>
+</div>
+
+<!-- Sistema principal -->
+<div id="main">
+  <button id="menuButton">☰</button>
+  <span id="menuButtonLabel" style="display:none;">Menu</span>
+  <div id="welcomeUser"></div>
+  <div id="total">$0</div>
+  <button id="addButton">+</button>
+</div>
 
 <div id="menu">
   <ul id="menuList"></ul>
 </div>
 
-<div id="main">
-  <h1>Bem-vindo(a)</h1>
-  <button id="startButton">Start</button>
-
-  <div id="total" style="display:none;">$0</div>
-  <button id="addButton">+</button>
-</div>
-
+<!-- Formulário de registro -->
 <div id="addForm">
   <input type="date" id="dateInput" />
   <input type="number" id="amountInput" placeholder="Valor" />
@@ -208,158 +204,136 @@ body {
     <option value="income">Ganho</option>
     <option value="expense">Gasto</option>
   </select>
+  <select id="paymentInput" style="display:none;">
+    <option value="pix">Pix</option>
+    <option value="cartao_credito">Cartão de Crédito</option>
+    <option value="cartao_debito">Cartão de Débito</option>
+  </select>
   <button id="submitButton">Enviar</button>
 </div>
 
 <script>
+// ---- LOGIN / CRIAR CONTA ----
+const loginPage = document.getElementById('loginPage');
+const usernameInput = document.getElementById('usernameInput');
+const passwordInput = document.getElementById('passwordInput');
+const loginButton = document.getElementById('loginButton');
+const createButton = document.getElementById('createButton');
+
+// ---- SISTEMA ----
 const menuButton = document.getElementById('menuButton');
 const menuButtonLabel = document.getElementById('menuButtonLabel');
 const menu = document.getElementById('menu');
 const menuList = document.getElementById('menuList');
-
-const startButton = document.getElementById('startButton');
+const main = document.getElementById('main');
+const welcomeUser = document.getElementById('welcomeUser');
 const totalDisplay = document.getElementById('total');
 const addButton = document.getElementById('addButton');
 const addForm = document.getElementById('addForm');
 const submitButton = document.getElementById('submitButton');
+const typeInput = document.getElementById('typeInput');
+const paymentInput = document.getElementById('paymentInput');
 
 let total = 0;
 let records = [];
 let menuOpen = false;
+let currentUser = "";
 
-// Abrir/fechar menu
+// ---- LOGIN ----
+loginButton.addEventListener('click', () => {
+  const username = usernameInput.value.trim();
+  const password = passwordInput.value.trim();
+  if(!username || !password) { alert('Preencha usuário e senha!'); return; }
+  if(!localStorage.getItem(`user_${username}`)) { alert('Usuário não existe! Crie uma conta.'); return; }
+  const userData = JSON.parse(localStorage.getItem(`user_${username}`));
+  if(userData.password !== password) { alert('Senha incorreta!'); return; }
+  currentUser = username;
+  records = userData.records || [];
+  total = 0; records.forEach(r => { if(r.type==='income') total+=r.amount; else total-=r.amount; });
+  loginPage.style.display = 'none';
+  main.style.display = 'flex';
+  welcomeUser.textContent = `BEM-VINDO(A) ${currentUser}`;
+  totalDisplay.textContent = `$${total}`;
+  updateMenu();
+});
+
+// ---- CRIAR CONTA ----
+createButton.addEventListener('click', () => {
+  const username = usernameInput.value.trim();
+  const password = passwordInput.value.trim();
+  if(!username || !password) { alert('Preencha usuário e senha!'); return; }
+  if(localStorage.getItem(`user_${username}`)) { alert('Usuário já existe!'); return; }
+  localStorage.setItem(`user_${username}`, JSON.stringify({password: password, records: []}));
+  alert('Conta criada com sucesso! Agora faça login.');
+});
+
+// ---- MENU ----
 menuButton.addEventListener('click', () => {
   menuOpen = !menuOpen;
-  if(menuOpen){
-    menu.classList.add('active');
-    menuButton.textContent = '✖';
-    menuButtonLabel.style.display = 'inline';
-  } else {
-    menu.classList.remove('active');
-    menuButton.textContent = '☰';
-    menuButtonLabel.style.display = 'none';
-  }
+  if(menuOpen){ menu.classList.add('active'); menuButton.textContent='✖'; menuButtonLabel.style.display='inline'; }
+  else { menu.classList.remove('active'); menuButton.textContent='☰'; menuButtonLabel.style.display='none'; }
 });
 
-// Start
-startButton.addEventListener('click', () => {
-  startButton.style.display = 'none';
-  totalDisplay.style.display = 'inline-block';
-  addButton.style.display = 'inline-block';
-  updateTotal();
-});
+// ---- FORMULÁRIO ----
+addButton.addEventListener('click', () => { addForm.style.display = addForm.style.display==='block'?'none':'block'; });
+typeInput.addEventListener('change', ()=> { paymentInput.style.display = typeInput.value==='expense'?'block':'none'; });
 
-// Abrir formulário
-addButton.addEventListener('click', () => {
-  addForm.style.display = addForm.style.display === 'block' ? 'none' : 'block';
-});
-
-// Adicionar registro
+// ---- ADICIONAR REGISTRO ----
 submitButton.addEventListener('click', () => {
   const date = document.getElementById('dateInput').value;
   const amount = parseFloat(document.getElementById('amountInput').value);
   const reason = document.getElementById('reasonInput').value;
-  const type = document.getElementById('typeInput').value;
-
-  if(!date || isNaN(amount)) {
-    alert('Preencha os campos obrigatórios');
-    return;
-  }
-
-  const record = { date, amount, reason, type };
+  const type = typeInput.value;
+  const payment = type==='expense'?paymentInput.value:"";
+  if(!date || isNaN(amount)) { alert('Preencha os campos!'); return; }
+  const record = { date, amount, reason, type, payment };
   records.push(record);
-
-  if(type === 'income') total += amount;
-  else total -= amount;
-
-  updateTotal();
-  updateMenu();
-
-  document.getElementById('dateInput').value = '';
-  document.getElementById('amountInput').value = '';
-  document.getElementById('reasonInput').value = '';
-  addForm.style.display = 'none';
+  if(type==='income') total+=amount; else total-=amount;
+  updateTotal(); updateMenu();
+  const userData = JSON.parse(localStorage.getItem(`user_${currentUser}`));
+  userData.records = records;
+  localStorage.setItem(`user_${currentUser}`, JSON.stringify(userData));
+  document.getElementById('dateInput').value='';
+  document.getElementById('amountInput').value='';
+  document.getElementById('reasonInput').value='';
+  paymentInput.value='pix';
+  paymentInput.style.display='none';
+  addForm.style.display='none';
 });
 
-// Atualizar total
-function updateTotal() {
-  totalDisplay.textContent = `$${total}`;
-  totalDisplay.style.color = total < 0 ? 'red' : 'black';
-}
+// ---- FUNÇÕES ----
+function updateTotal() { totalDisplay.textContent=`$${total}`; totalDisplay.style.color=total<0?'red':'black'; }
 
-// Atualizar menu com pastas por ano e mês
 function updateMenu(){
-  menuList.innerHTML = '';
-  const grouped = {};
-
-  // Agrupar por ano e mês
-  records.forEach(r => {
-    const [year, month] = r.date.split('-');
-    if(!grouped[year]) grouped[year] = {};
-    if(!grouped[year][month]) grouped[year][month] = [];
-    grouped[year][month].push(r);
-  });
-
+  menuList.innerHTML=''; const grouped={};
+  records.forEach(r=>{ const [year,month]=r.date.split('-'); if(!grouped[year]) grouped[year]={}; if(!grouped[year][month]) grouped[year][month]=[]; grouped[year][month].push(r); });
   for(const year in grouped){
-    const yearDiv = document.createElement('div');
-    yearDiv.className = 'year-section';
-    const yearTitle = document.createElement('h4');
-    yearTitle.textContent = year;
-    yearDiv.appendChild(yearTitle);
-
+    const yearDiv=document.createElement('div'); yearDiv.className='year-section';
+    const yearTitle=document.createElement('h4'); yearTitle.textContent=year; yearDiv.appendChild(yearTitle);
     for(const month in grouped[year]){
-      const monthDiv = document.createElement('div');
-      monthDiv.className = 'month-section';
-      const monthName = new Date(year, month-1).toLocaleString('pt-BR', { month: 'long' });
-      const monthTitle = document.createElement('h5');
-      monthTitle.textContent = monthName;
-      monthDiv.appendChild(monthTitle);
-
-      grouped[year][month].forEach((r,index)=>{
-        const li = document.createElement('li');
-
-        const divDateAmount = document.createElement('div');
-        divDateAmount.className = 'date-amount';
-        divDateAmount.textContent = `${formatDate(r.date)} : $${r.amount}`;
-        li.appendChild(divDateAmount);
-
-        if(r.reason){
-          const divReason = document.createElement('div');
-          divReason.className = 'reason';
-          divReason.textContent = r.reason;
-          li.appendChild(divReason);
-        }
-
-        const deleteBtn = document.createElement('button');
-        deleteBtn.className = 'deleteBtn';
-        deleteBtn.textContent = '🗑';
-        deleteBtn.onclick = () => deleteRecord(r);
-        li.appendChild(deleteBtn);
-
+      const monthDiv=document.createElement('div'); monthDiv.className='month-section';
+      const monthName=new Date(year,month-1).toLocaleString('pt-BR',{month:'long'});
+      const monthTitle=document.createElement('h5'); monthTitle.textContent=monthName; monthDiv.appendChild(monthTitle);
+      grouped[year][month].forEach(r=>{
+        const li=document.createElement('li');
+        const divDateAmount=document.createElement('div'); divDateAmount.className='date-amount'; divDateAmount.textContent=`${formatDate(r.date)} : $${r.amount}`; li.appendChild(divDateAmount);
+        if(r.reason){ const divReason=document.createElement('div'); divReason.className='reason'; divReason.textContent=r.reason; li.appendChild(divReason); }
+        if(r.payment){ const divPayment=document.createElement('div'); divPayment.className='payment';
+          const paymentText=r.payment==='pix'?'Pix':r.payment==='cartao_credito'?'Cartão de Crédito':'Cartão de Débito'; divPayment.textContent=paymentText; li.appendChild(divPayment); }
+        const deleteBtn=document.createElement('button'); deleteBtn.className='deleteBtn'; deleteBtn.textContent='🗑'; deleteBtn.onclick=()=>deleteRecord(r); li.appendChild(deleteBtn);
         monthDiv.appendChild(li);
       });
-
       yearDiv.appendChild(monthDiv);
     }
-
     menuList.appendChild(yearDiv);
   }
 }
 
-function formatDate(dateStr) {
-  const [year, month, day] = dateStr.split('-');
-  return `${day}/${month}/${year}`;
-}
+function formatDate(dateStr){ const [year,month,day]=dateStr.split('-'); return `${day}/${month}/${year}`; }
 
 function deleteRecord(record){
-  const index = records.indexOf(record);
-  if(index > -1){
-    if(record.type==='income') total -= record.amount;
-    else total += record.amount;
-    records.splice(index,1);
-    updateTotal();
-    updateMenu();
-  }
+  const index=records.indexOf(record); if(index>-1){ if(record.type==='income') total-=record.amount; else total+=record.amount;
+    records.splice(index,1); updateTotal(); updateMenu(); const userData=JSON.parse(localStorage.getItem(`user_${currentUser}`)); userData.records=records; localStorage.setItem(`user_${currentUser}`, JSON.stringify(userData)); }
 }
 </script>
 </body>
