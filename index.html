@@ -3,17 +3,22 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Controle Financeiro</title>
+<title>Controle Financeiro LOAK</title>
+
 <style>
 :root {
   --primary-color: #001f3f;
   --secondary-color: #ffffff;
   --input-border: #007BFF;
+  --accent-color: #007BFF;
+  --danger-color: #ff4d4d;
+  --success-color: #28a745;
+  --warning-color: #ffc107;
 }
 
 body {
   margin: 0;
-  font-family: Arial, sans-serif;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
   background-color: var(--secondary-color);
   color: var(--primary-color);
   display: flex;
@@ -21,6 +26,7 @@ body {
   min-height: 100vh;
 }
 
+/* --- LOGIN --- */
 #loginPage {
   display: flex;
   flex-direction: column;
@@ -28,42 +34,34 @@ body {
   align-items: center;
   flex: 1;
   text-align: center;
-  padding-top: 50px;
+  padding: 20px;
 }
 
-#loginPage h1 {
-  font-weight: bold;
-  font-size: 32px;
-  margin-bottom: 20px;
-}
+#loginPage h1 { font-size: 3rem; margin-bottom: 10px; letter-spacing: 5px; }
 
 #loginPage input {
-  padding: 10px;
+  padding: 12px;
   margin: 10px 0;
-  width: 250px;
+  width: 260px;
   border-radius: 10px;
   border: 2px solid var(--input-border);
-  background-color: #ffffff;
   outline: none;
-  font-size: 16px;
 }
 
-#loginPage button {
+#loginButtons { display: flex; gap: 10px; margin-top: 10px; }
+
+.btn-login {
   padding: 10px 20px;
   border-radius: 10px;
   border: none;
   background-color: var(--primary-color);
-  color: var(--secondary-color);
+  color: white;
   cursor: pointer;
+  font-weight: bold;
+  transition: 0.3s;
 }
 
-#loginButtons {
-  display: flex;
-  gap: 20px;
-  margin-top: 15px;
-}
-
-/* Menu lateral */
+/* --- MENU LATERAL --- */
 #menu {
   position: fixed;
   top: 0;
@@ -71,271 +69,444 @@ body {
   width: 320px;
   height: 100%;
   background-color: var(--primary-color);
-  color: var(--secondary-color);
+  color: white;
   padding: 20px;
-  box-sizing: border-box;
-  transition: left 0.3s;
+  transition: left 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   overflow-y: auto;
+  z-index: 900;
+  box-sizing: border-box;
 }
 
 #menu.active { left: 0; }
-#menuList { margin-top: 40px; list-style: none; padding: 0; }
 
+#menuList { margin-top: 60px; list-style: none; padding: 0; }
 .year-section { margin-bottom: 20px; }
-.year-section h4 { border-bottom: 1px solid rgba(255,255,255,0.3); padding-bottom: 3px; }
-.month-section { margin-left: 10px; margin-bottom: 10px; }
+.year-section h4 { border-bottom: 1px solid rgba(255,255,255,0.3); padding-bottom: 5px; }
+.month-section { margin-left: 10px; margin-bottom: 15px; }
+.month-section h5 { text-transform: capitalize; color: #aaa; margin: 5px 0; }
 
-#menuList li { padding: 8px 0; position: relative; }
-#menuList li div.date-amount { font-weight: bold; }
-#menuList li div.reason,
-#menuList li div.payment { font-size: 14px; margin-top: 2px; color: #eee; }
-#menuList li button.deleteBtn {
-  background: none; border: none; color: #fff; font-size: 16px; cursor: pointer;
-  position: absolute; right: 0; top: 10px;
+#menuList li {
+  padding: 12px;
+  background: rgba(255,255,255,0.05);
+  margin-bottom: 8px;
+  border-radius: 10px;
+  position: relative;
 }
 
-/* Botão de menu */
-#menuButton {
-  position: fixed;
-  top: 10px;
-  left: 10px;
+.date-amount { font-weight: bold; display: block; font-size: 0.9rem; }
+.reason { font-size: 0.8rem; opacity: 0.7; display: block; margin-top: 4px; }
+.deleteBtn {
+  background: none; border: none; color: var(--danger-color);
+  cursor: pointer; position: absolute; right: 10px; top: 12px; font-size: 1.2rem;
+}
+
+/* --- INTERFACE PRINCIPAL --- */
+#main {
+  flex: 1;
+  display: none;
+  flex-direction: column;
+  align-items: center;
+  padding-top: 80px;
+}
+
+#welcomeUser { font-size: 1.2rem; opacity: 0.8; }
+
+#total {
+  font-size: 3.5rem;
+  margin: 20px 0;
+  font-weight: bold;
+  border-bottom: 4px solid var(--primary-color);
+  padding-bottom: 5px;
+}
+
+/* --- BOTÕES FLUTUANTES (SPEED DIAL) --- */
+#actionContainer {
+  display: flex;
+  gap: 25px;
+  margin-top: 30px;
+  align-items: flex-end;
+}
+
+.fab-wrapper {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.actionBtn {
   background-color: var(--primary-color);
-  color: var(--secondary-color);
+  color: white;
   border: none;
-  padding: 10px;
-  font-size: 20px;
+  width: 70px;
+  height: 70px;
+  border-radius: 20px;
+  font-size: 28px;
   cursor: pointer;
-  z-index: 1000;
-  border-radius: 10px;
+  z-index: 10;
+  box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+  transition: transform 0.2s;
+}
+
+.actionBtn:active { transform: scale(0.9); }
+
+/* Sub-botões do Play */
+.sub-buttons {
+  position: absolute;
+  bottom: 80px;
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+  opacity: 0;
+  pointer-events: none;
+  transition: all 0.3s ease;
+  transform: translateY(20px);
+}
+
+.sub-buttons.active {
+  opacity: 1;
+  pointer-events: auto;
+  transform: translateY(0);
+}
+
+.mini-btn {
   width: 50px;
   height: 50px;
+  border-radius: 15px;
+  border: none;
+  color: white;
+  font-size: 20px;
+  cursor: pointer;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.2);
   display: flex;
   justify-content: center;
   align-items: center;
+  transition: 0.2s;
 }
 
-/* Conteúdo principal */
-#main {
-  flex: 1;
-  display: none; 
-  flex-direction: column;
-  align-items: center;
-  justify-content: flex-start;
-  padding-top: 60px;
-  text-align: center;
+.mini-btn:hover { transform: scale(1.1); }
+.btn-export { background-color: var(--success-color); }
+.btn-import { background-color: var(--warning-color); }
+
+.btn-label {
+    position: absolute;
+    right: 60px;
+    background: #333;
+    color: white;
+    padding: 4px 10px;
+    border-radius: 5px;
+    font-size: 12px;
+    white-space: nowrap;
 }
 
-#welcomeUser { font-size: 28px; font-weight: bold; margin-bottom: 20px; }
-#total { font-size: 32px; margin: 20px 0; border-bottom: 2px solid var(--primary-color); display: inline-block; padding-bottom: 5px; }
-
-/* Botão + */
-#addButton {
-  margin-top: 20px;
+/* --- BOTÃO MENU --- */
+#menuButton {
+  position: fixed;
+  top: 20px;
+  left: 20px;
   background-color: var(--primary-color);
-  color: var(--secondary-color);
+  color: white;
   border: none;
-  padding: 15px;
+  width: 50px;
+  height: 50px;
+  border-radius: 15px;
   font-size: 24px;
-  border-radius: 12px;
   cursor: pointer;
-  width: 60px;
-  height: 60px;
+  z-index: 1000;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.1);
 }
 
-/* Formulário */
+/* --- FORMULÁRIO --- */
 #addForm {
   display: none;
   position: fixed;
-  bottom: 80px;
-  right: 20px;
-  background-color: var(--secondary-color);
-  border: 1px solid var(--primary-color);
-  padding: 20px;
-  border-radius: 10px;
-  box-shadow: 0 2px 10px rgba(0,0,0,0.3);
-  z-index: 999;
+  bottom: 120px;
+  background-color: white;
+  border: 1px solid #ddd;
+  padding: 25px;
+  border-radius: 20px;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+  z-index: 1001;
 }
 
-#addForm input, #addForm select, #addForm button {
+#addForm input, #addForm select {
   display: block;
-  margin: 10px 0;
-  padding: 10px;
-  width: 200px;
+  margin: 12px 0;
+  padding: 12px;
+  width: 240px;
   border-radius: 10px;
-  border: 2px solid var(--input-border);
-  background-color: #ffffff;
-  outline: none;
+  border: 1px solid #ccc;
   font-size: 16px;
+}
+
+#submitButton {
+  width: 100%;
+  padding: 12px;
+  background: var(--primary-color);
+  color: white;
+  border: none;
+  border-radius: 10px;
+  cursor: pointer;
+  font-weight: bold;
 }
 </style>
 </head>
 <body>
 
-<!-- Login / Criar Conta -->
 <div id="loginPage">
   <h1>LOAK</h1>
-  <input type="text" id="usernameInput" placeholder="Usuário" />
-  <input type="password" id="passwordInput" placeholder="Senha" />
+  <input type="text" id="usernameInput" placeholder="Usuário">
+  <input type="password" id="passwordInput" placeholder="Senha">
   <div id="loginButtons">
-    <button id="loginButton">Entrar</button>
-    <button id="createButton">Criar Conta</button>
+    <button id="loginButton" class="btn-login">ENTRAR</button>
+    <button id="createButton" class="btn-login" style="background:#666">CRIAR CONTA</button>
   </div>
 </div>
 
-<!-- Sistema principal -->
 <div id="main">
   <button id="menuButton">☰</button>
-  <span id="menuButtonLabel" style="display:none;">Menu</span>
   <div id="welcomeUser"></div>
-  <div id="total">$0</div>
-  <button id="addButton">+</button>
+  <div id="total">$ 0,00</div>
+
+  <div id="actionContainer">
+      <button id="addButton" class="actionBtn">+</button>
+
+      <div class="fab-wrapper">
+          <div id="playOptions" class="sub-buttons">
+              <button class="mini-btn btn-export" onclick="exportarDados()" title="Exportar Backup">
+                <span class="btn-label">Exportar</span> ↓
+              </button>
+              <button class="mini-btn btn-import" onclick="triggerImport()" title="Importar Backup">
+                <span class="btn-label">Importar</span> ↑
+              </button>
+          </div>
+          <button id="playButton" class="actionBtn">▶</button>
+      </div>
+  </div>
 </div>
 
 <div id="menu">
+  <h2 style="margin-top:60px; letter-spacing: 2px;">HISTÓRICO</h2>
   <ul id="menuList"></ul>
 </div>
 
-<!-- Formulário de registro -->
 <div id="addForm">
-  <input type="date" id="dateInput" />
-  <input type="number" id="amountInput" placeholder="Valor" />
-  <input type="text" id="reasonInput" placeholder="Motivo (opcional)" />
+  <h3 style="margin:0 0 15px 0">Novo Registro</h3>
+  <input type="date" id="dateInput">
+  <input type="number" id="amountInput" placeholder="Valor (0.00)">
+  <input type="text" id="reasonInput" placeholder="Motivo/Descrição">
   <select id="typeInput">
-    <option value="income">Ganho</option>
-    <option value="expense">Gasto</option>
+    <option value="income">Ganho (+)</option>
+    <option value="expense">Gasto (-)</option>
   </select>
   <select id="paymentInput" style="display:none;">
     <option value="pix">Pix</option>
     <option value="cartao_credito">Cartão de Crédito</option>
     <option value="cartao_debito">Cartão de Débito</option>
   </select>
-  <button id="submitButton">Enviar</button>
+  <button id="submitButton">SALVAR</button>
 </div>
 
+<input type="file" id="importFileInput" style="display: none;" accept=".json">
+
 <script>
-// ---- LOGIN / CRIAR CONTA ----
-const loginPage = document.getElementById('loginPage');
-const usernameInput = document.getElementById('usernameInput');
-const passwordInput = document.getElementById('passwordInput');
-const loginButton = document.getElementById('loginButton');
-const createButton = document.getElementById('createButton');
-
-// ---- SISTEMA ----
-const menuButton = document.getElementById('menuButton');
-const menuButtonLabel = document.getElementById('menuButtonLabel');
-const menu = document.getElementById('menu');
-const menuList = document.getElementById('menuList');
-const main = document.getElementById('main');
-const welcomeUser = document.getElementById('welcomeUser');
-const totalDisplay = document.getElementById('total');
-const addButton = document.getElementById('addButton');
-const addForm = document.getElementById('addForm');
-const submitButton = document.getElementById('submitButton');
-const typeInput = document.getElementById('typeInput');
-const paymentInput = document.getElementById('paymentInput');
-
 let total = 0;
 let records = [];
-let menuOpen = false;
 let currentUser = "";
+let menuOpen = false;
 
-// ---- LOGIN ----
-loginButton.addEventListener('click', () => {
-  const username = usernameInput.value.trim();
-  const password = passwordInput.value.trim();
-  if(!username || !password) { alert('Preencha usuário e senha!'); return; }
-  if(!localStorage.getItem(`user_${username}`)) { alert('Usuário não existe! Crie uma conta.'); return; }
-  const userData = JSON.parse(localStorage.getItem(`user_${username}`));
-  if(userData.password !== password) { alert('Senha incorreta!'); return; }
-  currentUser = username;
-  records = userData.records || [];
-  total = 0; records.forEach(r => { if(r.type==='income') total+=r.amount; else total-=r.amount; });
-  loginPage.style.display = 'none';
-  main.style.display = 'flex';
-  welcomeUser.textContent = `BEM-VINDO(A) ${currentUser}`;
-  totalDisplay.textContent = `$${total}`;
-  updateMenu();
-});
+// Elementos
+const loginPage = document.getElementById('loginPage');
+const main = document.getElementById('main');
+const totalDisplay = document.getElementById('total');
+const welcomeUser = document.getElementById('welcomeUser');
+const playOptions = document.getElementById('playOptions');
+const addForm = document.getElementById('addForm');
+const importFileInput = document.getElementById('importFileInput');
 
-// ---- CRIAR CONTA ----
-createButton.addEventListener('click', () => {
-  const username = usernameInput.value.trim();
-  const password = passwordInput.value.trim();
-  if(!username || !password) { alert('Preencha usuário e senha!'); return; }
-  if(localStorage.getItem(`user_${username}`)) { alert('Usuário já existe!'); return; }
-  localStorage.setItem(`user_${username}`, JSON.stringify({password: password, records: []}));
-  alert('Conta criada com sucesso! Agora faça login.');
-});
-
-// ---- MENU ----
-menuButton.addEventListener('click', () => {
-  menuOpen = !menuOpen;
-  if(menuOpen){ menu.classList.add('active'); menuButton.textContent='✖'; menuButtonLabel.style.display='inline'; }
-  else { menu.classList.remove('active'); menuButton.textContent='☰'; menuButtonLabel.style.display='none'; }
-});
-
-// ---- FORMULÁRIO ----
-addButton.addEventListener('click', () => { addForm.style.display = addForm.style.display==='block'?'none':'block'; });
-typeInput.addEventListener('change', ()=> { paymentInput.style.display = typeInput.value==='expense'?'block':'none'; });
-
-// ---- ADICIONAR REGISTRO ----
-submitButton.addEventListener('click', () => {
-  const date = document.getElementById('dateInput').value;
-  const amount = parseFloat(document.getElementById('amountInput').value);
-  const reason = document.getElementById('reasonInput').value;
-  const type = typeInput.value;
-  const payment = type==='expense'?paymentInput.value:"";
-  if(!date || isNaN(amount)) { alert('Preencha os campos!'); return; }
-  const record = { date, amount, reason, type, payment };
-  records.push(record);
-  if(type==='income') total+=amount; else total-=amount;
-  updateTotal(); updateMenu();
-  const userData = JSON.parse(localStorage.getItem(`user_${currentUser}`));
-  userData.records = records;
-  localStorage.setItem(`user_${currentUser}`, JSON.stringify(userData));
-  document.getElementById('dateInput').value='';
-  document.getElementById('amountInput').value='';
-  document.getElementById('reasonInput').value='';
-  paymentInput.value='pix';
-  paymentInput.style.display='none';
-  addForm.style.display='none';
-});
-
-// ---- FUNÇÕES ----
-function updateTotal() { totalDisplay.textContent=`$${total}`; totalDisplay.style.color=total<0?'red':'black'; }
-
-function updateMenu(){
-  menuList.innerHTML=''; const grouped={};
-  records.forEach(r=>{ const [year,month]=r.date.split('-'); if(!grouped[year]) grouped[year]={}; if(!grouped[year][month]) grouped[year][month]=[]; grouped[year][month].push(r); });
-  for(const year in grouped){
-    const yearDiv=document.createElement('div'); yearDiv.className='year-section';
-    const yearTitle=document.createElement('h4'); yearTitle.textContent=year; yearDiv.appendChild(yearTitle);
-    for(const month in grouped[year]){
-      const monthDiv=document.createElement('div'); monthDiv.className='month-section';
-      const monthName=new Date(year,month-1).toLocaleString('pt-BR',{month:'long'});
-      const monthTitle=document.createElement('h5'); monthTitle.textContent=monthName; monthDiv.appendChild(monthTitle);
-      grouped[year][month].forEach(r=>{
-        const li=document.createElement('li');
-        const divDateAmount=document.createElement('div'); divDateAmount.className='date-amount'; divDateAmount.textContent=`${formatDate(r.date)} : $${r.amount}`; li.appendChild(divDateAmount);
-        if(r.reason){ const divReason=document.createElement('div'); divReason.className='reason'; divReason.textContent=r.reason; li.appendChild(divReason); }
-        if(r.payment){ const divPayment=document.createElement('div'); divPayment.className='payment';
-          const paymentText=r.payment==='pix'?'Pix':r.payment==='cartao_credito'?'Cartão de Crédito':'Cartão de Débito'; divPayment.textContent=paymentText; li.appendChild(divPayment); }
-        const deleteBtn=document.createElement('button'); deleteBtn.className='deleteBtn'; deleteBtn.textContent='🗑'; deleteBtn.onclick=()=>deleteRecord(r); li.appendChild(deleteBtn);
-        monthDiv.appendChild(li);
-      });
-      yearDiv.appendChild(monthDiv);
+// --- LOGIN ---
+document.getElementById('loginButton').onclick = () => {
+    const user = document.getElementById('usernameInput').value.trim();
+    const pass = document.getElementById('passwordInput').value.trim();
+    const stored = localStorage.getItem(`user_${user}`);
+    
+    if(!stored) return alert("Usuário não cadastrado!");
+    const userData = JSON.parse(stored);
+    
+    if(userData.password === pass) {
+        currentUser = user;
+        records = userData.records || [];
+        loginPage.style.display = 'none';
+        main.style.display = 'flex';
+        welcomeUser.textContent = `BEM-VINDO, ${currentUser.toUpperCase()}`;
+        salvarESincronizar();
+    } else {
+        alert("Senha incorreta!");
     }
-    menuList.appendChild(yearDiv);
-  }
+};
+
+document.getElementById('createButton').onclick = () => {
+    const user = document.getElementById('usernameInput').value.trim();
+    const pass = document.getElementById('passwordInput').value.trim();
+    if(!user || !pass) return alert("Preencha os campos!");
+    if(localStorage.getItem(`user_${user}`)) return alert("Usuário já existe!");
+    localStorage.setItem(`user_${user}`, JSON.stringify({password: pass, records: []}));
+    alert("Conta criada!");
+};
+
+// --- INTERAÇÕES ---
+document.getElementById('menuButton').onclick = () => {
+    menuOpen = !menuOpen;
+    document.getElementById('menu').classList.toggle("active");
+    document.getElementById('menuButton').textContent = menuOpen ? "✖" : "☰";
+};
+
+document.getElementById('addButton').onclick = () => {
+    addForm.style.display = addForm.style.display === 'block' ? 'none' : 'block';
+};
+
+// Abre/Fecha as opções do Play
+document.getElementById('playButton').onclick = (e) => {
+    e.stopPropagation();
+    playOptions.classList.toggle('active');
+};
+
+// Fecha o menu do play se clicar fora
+document.addEventListener('click', () => {
+    playOptions.classList.remove('active');
+});
+
+document.getElementById('typeInput').onchange = (e) => {
+    document.getElementById('paymentInput').style.display = e.target.value === 'expense' ? 'block' : 'none';
+};
+
+// --- SALVAR REGISTRO ---
+document.getElementById('submitButton').onclick = () => {
+    const date = document.getElementById('dateInput').value;
+    const amount = parseFloat(document.getElementById('amountInput').value);
+    const reason = document.getElementById('reasonInput').value;
+    const type = document.getElementById('typeInput').value;
+    const payment = type === 'expense' ? document.getElementById('paymentInput').value : "";
+
+    if(!date || isNaN(amount)) return alert("Preencha os campos obrigatórios!");
+
+    const newRecord = { 
+        date, amount, reason, type, payment, 
+        id: Date.now() + Math.random().toString(36).substr(2, 5) 
+    };
+    
+    records.push(newRecord);
+    salvarESincronizar();
+    addForm.style.display = 'none';
+    limparCampos();
+};
+
+function limparCampos() {
+    document.getElementById('amountInput').value = "";
+    document.getElementById('reasonInput').value = "";
 }
 
-function formatDate(dateStr){ const [year,month,day]=dateStr.split('-'); return `${day}/${month}/${year}`; }
+// --- EXPORTAR / IMPORTAR ---
+function exportarDados() {
+    const dataStr = JSON.stringify(records);
+    const dataUri = 'data:application/json;charset=utf-8,' + encodeURIComponent(dataStr);
+    const link = document.createElement('a');
+    link.setAttribute('href', dataUri);
+    link.setAttribute('download', `loak_backup_${currentUser}.json`);
+    link.click();
+}
 
-function deleteRecord(record){
-  const index=records.indexOf(record); if(index>-1){ if(record.type==='income') total-=record.amount; else total+=record.amount;
-    records.splice(index,1); updateTotal(); updateMenu(); const userData=JSON.parse(localStorage.getItem(`user_${currentUser}`)); userData.records=records; localStorage.setItem(`user_${currentUser}`, JSON.stringify(userData)); }
+function triggerImport() {
+    importFileInput.click();
+}
+
+importFileInput.onchange = (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = (event) => {
+        try {
+            const imported = JSON.parse(event.target.result);
+            let count = 0;
+            imported.forEach(imp => {
+                if (!records.some(r => r.id === imp.id)) {
+                    records.push(imp);
+                    count++;
+                }
+            });
+            if(count > 0) {
+                records.sort((a,b) => new Date(a.date) - new Date(b.date));
+                salvarESincronizar();
+                alert(`${count} novos itens sincronizados!`);
+            } else {
+                alert("Tudo atualizado!");
+            }
+        } catch(err) { alert("Arquivo inválido!"); }
+    };
+    reader.readAsText(file);
+    importFileInput.value = "";
+};
+
+// --- ATUALIZAÇÃO ---
+function salvarESincronizar() {
+    const userData = JSON.parse(localStorage.getItem(`user_${currentUser}`));
+    userData.records = records;
+    localStorage.setItem(`user_${currentUser}`, JSON.stringify(userData));
+    recalcularTotal();
+    atualizarHistorico();
+}
+
+function recalcularTotal() {
+    total = records.reduce((acc, r) => r.type === 'income' ? acc + r.amount : acc - r.amount, 0);
+    totalDisplay.textContent = `$ ${total.toLocaleString('pt-BR', {minimumFractionDigits: 2})}`;
+    totalDisplay.style.color = total < 0 ? "var(--danger-color)" : "var(--primary-color)";
+}
+
+function atualizarHistorico() {
+    const menuList = document.getElementById('menuList');
+    menuList.innerHTML = '';
+    const grouped = {};
+
+    records.forEach(r => {
+        const [year, month] = r.date.split('-');
+        if (!grouped[year]) grouped[year] = {};
+        if (!grouped[year][month]) grouped[year][month] = [];
+        grouped[year][month].push(r);
+    });
+
+    Object.keys(grouped).sort((a,b) => b-a).forEach(year => {
+        const yearSection = document.createElement('div');
+        yearSection.className = 'year-section';
+        yearSection.innerHTML = `<h4>${year}</h4>`;
+
+        Object.keys(grouped[year]).sort((a,b) => b-a).forEach(month => {
+            const monthSection = document.createElement('div');
+            monthSection.className = 'month-section';
+            const nomeMes = new Date(year, month - 1).toLocaleString('pt-BR', { month: 'long' });
+            monthSection.innerHTML = `<h5>${nomeMes}</h5>`;
+
+            grouped[year][month].forEach(r => {
+                const li = document.createElement('li');
+                li.innerHTML = `
+                    <span class="date-amount">${r.date.split('-').reverse().join('/')} — $ ${r.amount.toFixed(2)}</span>
+                    <span class="reason">${r.reason || 'Sem descrição'} ${r.payment ? '('+r.payment.toUpperCase()+')' : ''}</span>
+                    <button class="deleteBtn" onclick="deletar('${r.id}')">🗑</button>
+                `;
+                monthSection.appendChild(li);
+            });
+            yearSection.appendChild(monthSection);
+        });
+        menuList.appendChild(yearSection);
+    });
+}
+
+function deletar(id) {
+    if(confirm("Excluir registro?")) {
+        records = records.filter(r => r.id !== id);
+        salvarESincronizar();
+    }
 }
 </script>
+
 </body>
 </html>
-
