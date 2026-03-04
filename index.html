@@ -79,18 +79,46 @@ body {
 
 #menu.active { left: 0; }
 
-#menuList { margin-top: 60px; list-style: none; padding: 0; }
-.year-section { margin-bottom: 20px; }
-.year-section h4 { border-bottom: 1px solid rgba(255,255,255,0.3); padding-bottom: 5px; }
-.month-section { margin-left: 10px; margin-bottom: 15px; }
-.month-section h5 { text-transform: capitalize; color: #aaa; margin: 5px 0; }
+#searchBar {
+  width: 100%;
+  padding: 10px;
+  margin-top: 60px;
+  border-radius: 8px;
+  border: 1px solid rgba(255,255,255,0.3);
+  background: rgba(0,0,0,0.2);
+  color: white;
+  outline: none;
+}
+
+#menuList { margin-top: 10px; list-style: none; padding: 0; }
+
+.folder-header {
+  cursor: pointer;
+  padding: 12px;
+  background: rgba(255,255,255,0.1);
+  margin-top: 5px;
+  border-radius: 8px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-weight: bold;
+}
+
+.folder-content {
+  display: none;
+  padding-left: 10px;
+  margin-bottom: 10px;
+}
+
+.folder-content.show { display: block; }
 
 #menuList li {
   padding: 12px;
   background: rgba(255,255,255,0.05);
-  margin-bottom: 8px;
+  margin-top: 8px;
   border-radius: 10px;
   position: relative;
+  list-style: none;
 }
 
 .date-amount { font-weight: bold; display: block; font-size: 0.9rem; }
@@ -119,7 +147,7 @@ body {
   padding-bottom: 5px;
 }
 
-/* --- BOTÕES FLUTUANTES (SPEED DIAL) --- */
+/* --- BOTÕES FLUTUANTES --- */
 #actionContainer {
   display: flex;
   gap: 25px;
@@ -148,9 +176,6 @@ body {
   transition: transform 0.2s;
 }
 
-.actionBtn:active { transform: scale(0.9); }
-
-/* Sub-botões do Play */
 .sub-buttons {
   position: absolute;
   bottom: 80px;
@@ -163,11 +188,7 @@ body {
   transform: translateY(20px);
 }
 
-.sub-buttons.active {
-  opacity: 1;
-  pointer-events: auto;
-  transform: translateY(0);
-}
+.sub-buttons.active { opacity: 1; pointer-events: auto; transform: translateY(0); }
 
 .mini-btn {
   width: 50px;
@@ -181,10 +202,8 @@ body {
   display: flex;
   justify-content: center;
   align-items: center;
-  transition: 0.2s;
 }
 
-.mini-btn:hover { transform: scale(1.1); }
 .btn-export { background-color: var(--success-color); }
 .btn-import { background-color: var(--warning-color); }
 
@@ -199,7 +218,6 @@ body {
     white-space: nowrap;
 }
 
-/* --- BOTÃO MENU --- */
 #menuButton {
   position: fixed;
   top: 20px;
@@ -213,10 +231,8 @@ body {
   font-size: 24px;
   cursor: pointer;
   z-index: 1000;
-  box-shadow: 0 2px 10px rgba(0,0,0,0.1);
 }
 
-/* --- FORMULÁRIO --- */
 #addForm {
   display: none;
   position: fixed;
@@ -236,7 +252,6 @@ body {
   width: 240px;
   border-radius: 10px;
   border: 1px solid #ccc;
-  font-size: 16px;
 }
 
 #submitButton {
@@ -280,14 +295,14 @@ body {
                 <span class="btn-label">Importar</span> ↑
               </button>
           </div>
-          <button id="playButton" class="actionBtn">▶</button>
+          <button id="playButton" class="actionBtn">▶️</button>
       </div>
   </div>
 </div>
 
 <div id="menu">
-  <h2 style="margin-top:60px; letter-spacing: 2px;">HISTÓRICO</h2>
-  <ul id="menuList"></ul>
+  <input type="text" id="searchBar" placeholder="🔍 Pesquisar dia, mês ou motivo..." onkeyup="atualizarHistorico()">
+  <div id="menuList"></div>
 </div>
 
 <div id="addForm">
@@ -315,7 +330,8 @@ let records = [];
 let currentUser = "";
 let menuOpen = false;
 
-// Elementos
+const mesesNomes = ["janeiro", "fevereiro", "março", "abril", "maio", "junho", "julho", "agosto", "setembro", "outubro", "novembro", "dezembro"];
+
 const loginPage = document.getElementById('loginPage');
 const main = document.getElementById('main');
 const totalDisplay = document.getElementById('total');
@@ -359,19 +375,18 @@ document.getElementById('menuButton').onclick = () => {
     menuOpen = !menuOpen;
     document.getElementById('menu').classList.toggle("active");
     document.getElementById('menuButton').textContent = menuOpen ? "✖" : "☰";
+    if(menuOpen) atualizarHistorico();
 };
 
 document.getElementById('addButton').onclick = () => {
     addForm.style.display = addForm.style.display === 'block' ? 'none' : 'block';
 };
 
-// Abre/Fecha as opções do Play
 document.getElementById('playButton').onclick = (e) => {
     e.stopPropagation();
     playOptions.classList.toggle('active');
 };
 
-// Fecha o menu do play se clicar fora
 document.addEventListener('click', () => {
     playOptions.classList.remove('active');
 });
@@ -427,27 +442,19 @@ importFileInput.onchange = (e) => {
     reader.onload = (event) => {
         try {
             const imported = JSON.parse(event.target.result);
-            let count = 0;
             imported.forEach(imp => {
-                if (!records.some(r => r.id === imp.id)) {
-                    records.push(imp);
-                    count++;
-                }
+                if (!records.some(r => r.id === imp.id)) records.push(imp);
             });
-            if(count > 0) {
-                records.sort((a,b) => new Date(a.date) - new Date(b.date));
-                salvarESincronizar();
-                alert(`${count} novos itens sincronizados!`);
-            } else {
-                alert("Tudo atualizado!");
-            }
+            records.sort((a,b) => new Date(a.date) - new Date(b.date));
+            salvarESincronizar();
+            alert("Sincronizado!");
         } catch(err) { alert("Arquivo inválido!"); }
     };
     reader.readAsText(file);
     importFileInput.value = "";
 };
 
-// --- ATUALIZAÇÃO ---
+// --- ATUALIZAÇÃO E BUSCA INTELIGENTE ---
 function salvarESincronizar() {
     const userData = JSON.parse(localStorage.getItem(`user_${currentUser}`));
     userData.records = records;
@@ -464,10 +471,22 @@ function recalcularTotal() {
 
 function atualizarHistorico() {
     const menuList = document.getElementById('menuList');
+    const search = document.getElementById('searchBar').value.toLowerCase();
     menuList.innerHTML = '';
-    const grouped = {};
+    
+    const filtered = records.filter(r => {
+        const [year, month, day] = r.date.split('-');
+        const nomeMes = mesesNomes[parseInt(month) - 1];
+        const dataFormatada = `${day}/${month}/${year}`;
+        
+        return r.reason.toLowerCase().includes(search) || 
+               dataFormatada.includes(search) || 
+               nomeMes.includes(search) ||
+               r.date.includes(search);
+    });
 
-    records.forEach(r => {
+    const grouped = {};
+    filtered.forEach(r => {
         const [year, month] = r.date.split('-');
         if (!grouped[year]) grouped[year] = {};
         if (!grouped[year][month]) grouped[year][month] = [];
@@ -475,28 +494,45 @@ function atualizarHistorico() {
     });
 
     Object.keys(grouped).sort((a,b) => b-a).forEach(year => {
-        const yearSection = document.createElement('div');
-        yearSection.className = 'year-section';
-        yearSection.innerHTML = `<h4>${year}</h4>`;
+        const yearHeader = document.createElement('div');
+        yearHeader.className = 'folder-header';
+        yearHeader.innerHTML = `<span>📂 ${year}</span> <span>▼</span>`;
+        
+        const yearContent = document.createElement('div');
+        yearContent.className = search !== "" ? 'folder-content show' : 'folder-content';
+        yearHeader.onclick = () => yearContent.classList.toggle('show');
 
         Object.keys(grouped[year]).sort((a,b) => b-a).forEach(month => {
-            const monthSection = document.createElement('div');
-            monthSection.className = 'month-section';
-            const nomeMes = new Date(year, month - 1).toLocaleString('pt-BR', { month: 'long' });
-            monthSection.innerHTML = `<h5>${nomeMes}</h5>`;
+            const monthHeader = document.createElement('div');
+            monthHeader.className = 'folder-header';
+            monthHeader.style.fontSize = '0.9rem';
+            monthHeader.style.background = 'rgba(255,255,255,0.05)';
+            const nomeMesDisplay = mesesNomes[parseInt(month) - 1];
+            monthHeader.innerHTML = `<span>📅 ${nomeMesDisplay.toUpperCase()}</span> <span>▼</span>`;
+            
+            const monthContent = document.createElement('div');
+            monthContent.className = search !== "" ? 'folder-content show' : 'folder-content';
+            monthHeader.onclick = (e) => {
+                e.stopPropagation();
+                monthContent.classList.toggle('show');
+            };
 
             grouped[year][month].forEach(r => {
                 const li = document.createElement('li');
                 li.innerHTML = `
-                    <span class="date-amount">${r.date.split('-').reverse().join('/')} — $ ${r.amount.toFixed(2)}</span>
+                    <span class="date-amount" style="color:${r.type === 'income' ? '#28a745':'#ff4d4d'}">
+                        ${r.date.split('-').reverse().join('/')} — $ ${r.amount.toFixed(2)}
+                    </span>
                     <span class="reason">${r.reason || 'Sem descrição'} ${r.payment ? '('+r.payment.toUpperCase()+')' : ''}</span>
                     <button class="deleteBtn" onclick="deletar('${r.id}')">🗑</button>
                 `;
-                monthSection.appendChild(li);
+                monthContent.appendChild(li);
             });
-            yearSection.appendChild(monthSection);
+            yearContent.appendChild(monthHeader);
+            yearContent.appendChild(monthContent);
         });
-        menuList.appendChild(yearSection);
+        menuList.appendChild(yearHeader);
+        menuList.appendChild(yearContent);
     });
 }
 
@@ -506,7 +542,8 @@ function deletar(id) {
         salvarESincronizar();
     }
 }
-</script>
 
+document.getElementById('dateInput').valueAsDate = new Date();
+</script>
 </body>
 </html>
